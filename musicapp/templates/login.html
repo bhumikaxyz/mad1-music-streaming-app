@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <form method="post" action="">
+        
+        {{ form.hidden_tag() }}
+
+        <div>
+            {{ form.username.label }}
+            
+            {% if form.username.errors %}
+                {{ form.username() }}
+                {% for error in form.username.errors %}
+                    {{ error }}  
+                {% endfor %}
+            {% else %}
+                {{ form.username() }}
+            {% endif %}
+        </div>
+        <div>
+            {{ form.password.label }}
+            
+            {% if form.password.errors %}
+                {{ form.password() }}
+                {% for error in form.password.errors %}
+                    {{ error }}  
+                {% endfor %}
+            {% else %}
+                {{ form.password() }}
+            {% endif %}
+        </div>
+        <div>
+            {{ form.remember()}}  {{ form.remember.label }}
+        </div>
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form> 
+
+{% endblock content %}
