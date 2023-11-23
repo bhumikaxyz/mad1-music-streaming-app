@@ -1,6 +1,7 @@
 from musicapp import app
 from flask import render_template, url_for, flash, redirect
 from musicapp.forms import RegistrationForm, LoginForm
+from musicapp.models import User, Song
 
 
 @app.route('/')
@@ -23,5 +24,9 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         flash(f'You are now logged in as {form.username.data}', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('userhome'))
     return render_template('login.html', title='Login', form=form)
+
+@app.route('/user-home')
+def userhome():
+    return render_template('user-home.html')
