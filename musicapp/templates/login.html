@@ -1,8 +1,54 @@
-{% extends "layout.html" %}
+{% extends "layout.html" %} {% block content %}
+<div
+  class="container-sm d-flex justify-content-center align-items-center"
+  style="height: 90vh"
+>
+  <form
+    method="post"
+    action=""
+    style="margin-top: 5em; margin-bottom: auto; margin-bottom: auto"
+    class="form-outline w-50"
+  >
+    {{ form.hidden_tag() }}
+    <img
+      class="mb-4"
+      src="{{ url_for('static', filename = '/musical-note.png') }}"
+      alt="Logo"
+      width="90"
+      height="90"
+      style="display: block; margin-left: auto; margin-right: auto"
+    />
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label"
+        >{{ form.username.label }}</label
+      >
+      {% if form.username.errors %} 
+        {{ form.username(class="form-control") }} 
+          <div class="text-danger">{{ form.username.errors[0] }}</div>
+      {% else %} 
+            {{ form.username(class="form-control") }} 
+      {% endif %}
+    </div>
+    <div class="mb-3">
+      <label for="inputPassword5" class="form-label"
+        >{{ form.password.label }}</label
+      >
+      {{ form.password(class="form-control") }}
+    </div>
+    <div class="form-check">
+      {{ form.remember(class="form-check-input")}}
+      <label class="form-check-label" for="flexCheckDefault">
+        {{ form.remember.label }}
+      </label>
+    </div>
+    <div>{{ form.submit(class="btn btn-primary my-3") }}</div>
+  </form>
+</div>
 
-{% block content %}
+{% endblock content %}
 
-    <form method="post" action="">
+<!-- <form method="post" action="">
         
         {{ form.hidden_tag() }}
 
@@ -36,6 +82,4 @@
         <div>
             {{ form.submit() }}
         </div>
-    </form> 
-
-{% endblock content %}
+    </form>  -->

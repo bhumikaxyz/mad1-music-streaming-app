@@ -4,13 +4,15 @@ content %}
   <div class="row align-items-center" style="height: 90vh;">
     <div class="col">
       <h1>welcome to cuhu</h1>
-
-      <a href="{{  url_for('register')  }}">
-        <button type="button" class="btn btn-outline-primary">Register</button>
+      <hr class="my-4"> 
+      
+        <a href="{{ url_for('register') }}">
+        <button type="button" class="btn btn-outline-primary mx-4">Register</button>
       </a>
-    
+      
+      
       <a href="{{ url_for('login') }}">
-        <button type="button" class="btn btn-outline-primary">Sign In</button>
+        <button type="button" class="btn btn-outline-primary mx-4">Sign In</button>
       </a>
     </div>
   </div>

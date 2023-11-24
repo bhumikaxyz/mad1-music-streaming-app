@@ -1,0 +1,76 @@
+{% extends "layout.html" %} 
+
+{% block content %}
+
+<div
+  class="container-sm d-flex justify-content-center align-items-center"
+  style="height: 90vh"
+>
+  <form
+    method="post"
+    action=""
+    style="margin-top: 5em; margin-bottom: auto; margin-bottom: auto"
+    class="form-outline w-50"
+  >
+    {{ form.hidden_tag() }}
+
+    <h1 class="h3 mb-3 font-weight-normal text-center">Upload a Song</h1>
+    <div class="mb-3">
+      <p class="lead text-center">
+        Cannot find your favorite tune in our library? Upload a song from your
+        device and start listening to it today!
+      </p>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">{{ form.title.label }}</label>
+      {% if form.title.errors %} {{ form.title(class="form-control") }}
+      <div class="text-danger">{{ form.title.errors[0] }}</div>
+      {% else %} {{ form.title(class="form-control") }} {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label"
+        >{{ form.path.label }}</label
+      >
+      {% if form.path.errors %} {{ form.path(class="form-control") }}
+      <div class="text-danger">{{ form.path.errors[0] }}</div>
+      {% else %} {{ form.path(class="form-control") }} {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label"
+        >{{ form.duration.label }}</label
+      >
+      {% if form.duration.errors %} 
+        {{ form.duration(class="form-control") }} 
+          <div class="text-danger">{{ form.duration.errors[0] }}</div>
+      {% else %} 
+            {{ form.duration(class="form-control") }} 
+      {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label"
+        >{{ form.genre.label }}</label>
+      <select class="form-select"> 
+        <option selected>Other</option>
+        <option value="1">One</option>
+        <option value="2">Two</option>
+        <option value="3">Three</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label"
+        >{{ form.lyrics.label }}</label
+      >
+      {% if form.lyrics.errors %} {{ form.lyrics(class="form-control") }}
+      <div class="text-danger">{{ form.lyrics.errors[0] }}</div>
+      {% else %} {{ form.lyrics(class="form-control") }} {% endif %}
+    </div> 
+    <div>{{ form.submit(class="btn btn-primary my-3") }}</div>
+  </form>
+</div>
+
+{% endblock content %}
