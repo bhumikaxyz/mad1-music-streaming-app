@@ -34,3 +34,9 @@ class UploadForm(FlaskForm):
     lyrics = TextAreaField('Lyrics')
     submit = SubmitField('Upload')
 
+class CreatePlayListForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(max=100)])
+    submit = SubmitField('Add Songs') 
+
+
+

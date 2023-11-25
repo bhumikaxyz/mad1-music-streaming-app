@@ -1,0 +1,47 @@
+{% extends "layout.html" %} 
+    {% block content %}
+
+    <div class="container-sm d-flex mt-5 p-2 gap-5" style="height: 90vh;">
+        <div class="container w-50 h-100 p-3 bg-danger-subtle shadow opacity-90 overflow-auto">
+            <h1 class="display-6 mb-4">Lyrics</h1>
+            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Magnam repellat ullam, quaerat dolor eaque consequuntur accusamus cupiditate, inventore, quam culpa repudiandae perferendis veniam cumque ea? Consectetur aut, officiis perferendis doloremque repellat obcaecati blanditiis atque laboriosam voluptates culpa optio porro eligendi beatae harum expedita asperiores repellendus impedit non molestias quaerat! Unde laudantium, illum voluptatum ea fugiat blanditiis quibusdam, laborum illo delectus similique optio doloribus praesentium non. Assumenda at dicta reprehenderit aperiam in, quam, aliquid, dolores ab eveniet odit totam explicabo maxime cum ratione architecto voluptates ex. Temporibus nam esse reprehenderit. Iure voluptate perspiciatis eos veniam tempora. Architecto repudiandae nam officiis tenetur modi sint doloremque, laudantium totam qui eius fugit porro veritatis ducimus nemo, voluptas non consectetur explicabo quaerat alias soluta molestiae corrupti consequatur labore. At perferendis alias voluptate eligendi nemo voluptatem numquam nostrum modi dignissimos nihil placeat molestias cumque ut sed delectus aliquam unde nisi velit inventore, doloremque et. Temporibus nulla corporis magni aut repudiandae animi molestias, nam accusantium vel quisquam unde rerum laudantium nostrum placeat. Veniam vitae rem distinctio a quia, iure quaerat omnis cum tenetur eaque est dolores voluptatem maiores aliquid aperiam sed fugiat cupiditate fugit quod laudantium exercitationem asperiores molestiae voluptatibus? Sint molestiae eaque voluptates voluptatibus. Quae molestiae ut earum consequuntur cumque. Consequatur vel velit quod veritatis rem neque illo quaerat perferendis quam vitae consectetur voluptate vero nostrum deserunt, tempore fugit officia ducimus autem eos dolorum! Voluptas nobis sapiente eveniet vel. Quae quasi ullam mollitia distinctio enim sapiente aliquid accusantium explicabo magni ratione! Repellat quasi quidem laboriosam nisi deserunt, possimus omnis eos praesentium enim aliquam accusantium aperiam officiis, beatae asperiores! Quibusdam, aut officia adipisci, veniam libero assumenda omnis eaque placeat atque in ullam quia deleniti a voluptate unde temporibus fuga ad iusto dicta cum asperiores vero? Ratione dolore itaque id nobis debitis repellat aliquid vitae ducimus repellendus aspernatur.
+        </div>
+        <div class="container d-block w-50 h-100 p-3 justify-content-center">
+
+            <div class="container align-items-top mx-5">
+                <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-3 shadow" alt="..." width="200 px" height="200 px";">
+            </div>
+
+            <div class="container mb-4">
+                <h3>Song Title</h3>
+            <h3><small class="text-body-secondary">Artist Name</small></h3>
+
+            </div>
+            
+
+            <div class="container mb-5">
+                <button class="btn" data-bs-toggle="button"><i class="bi bi-heart"></i></button>
+
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Rate
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">1</a></li>
+                  <li><a class="dropdown-item" href="#">2</a></li>
+                  <li><a class="dropdown-item" href="#">3</a></li>
+                  <li><a class="dropdown-item" href="#">4</a></li>
+                  <li><a class="dropdown-item" href="#">5</a></li>
+                </ul>
+              </div>
+
+            </div>   
+            
+            
+            <div class="container align-items-end mt-2">
+                <audio controls src="{{  url_for('static', filename="/audios/karma.mp3" )  }}" class="embed-responsive-item mt-5 align-items-end justify-content-end" style="width: 450px;"></audio>
+            </div>
+        </div>
+        
+      </div>
+    {% endblock content %}

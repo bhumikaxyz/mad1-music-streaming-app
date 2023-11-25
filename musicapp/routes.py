@@ -1,6 +1,6 @@
 from musicapp import app
 from flask import render_template, url_for, flash, redirect
-from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UploadForm
+from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UploadForm, CreatePlayListForm
 from musicapp.models import User, Song
 
 
@@ -57,3 +57,17 @@ def upload_song():
         return redirect(url_for('home'))
     
     return render_template('upload_song.html', form=form)
+
+
+@app.route('/play_song')
+def play_song():
+    return render_template('play_song.html')
+
+@app.route('/create_playlist')
+def create_playlist():
+    form = CreatePlayListForm()
+    return render_template('create_playlist.html', form=form)\
+    
+@app.route('/admin_options')
+def admin_options():
+    return render_template('admin_options.html')

@@ -1,0 +1,45 @@
+{% extends "layout.html" %} 
+{% block content %}
+
+<div
+class="container-md pt-5 mt-4 justify-content-center align-items-center"
+style="height: 90vh"
+>
+<h3 class="h3 mb-4 font-weight-normal">More Options</h3>
+
+<div class="container bg-light w-100 mb-5 rounded">
+    <h3 class="display-6 mb-4">Tracks</h3>
+
+    <div class="form-check form-switch form-check-reverse mb-3">
+        <input class="form-check-input mx-5" type="checkbox" role="switch">
+        <button type="button" class="btn btn-danger btn-sm mx-5 mb-3">Song Details</button>
+        <label class="form-check-label float-start">Song 1</label>
+    </div>
+
+    <div class="form-check form-switch form-check-reverse mb-3">
+        <input class="form-check-input mx-5" type="checkbox" role="switch">
+        <button type="button" class="btn btn-danger btn-sm mx-5 mb-3">Song Details</button>
+        <label class="form-check-label float-start">Song 2</label>
+    </div>
+
+</div>
+
+<div class="container bg-light w-100 mb-3 rounded">
+    <h3 class="display-6 mb-4">Creators</h3>
+
+    <div class="form-check form-switch form-check-reverse mb-3">
+        <input class="form-check-input mx-5" type="checkbox" role="switch">
+        <!-- <button type="button" class="btn btn-danger btn-sm mx-5">Song Details</button> -->
+        <label class="form-check-label float-start">Creator 1</label>
+    </div>
+
+    <div class="form-check form-switch form-check-reverse mb-3">
+        <input class="form-check-input mx-5" type="checkbox" role="switch">
+        <!-- <button type="button" class="btn btn-danger btn-sm mx-5">Song Details</button> -->
+        <label class="form-check-label float-start">Creator 2</label>
+    </div>
+
+</div>
+
+</div>
+{% endblock content %}
