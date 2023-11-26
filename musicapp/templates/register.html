@@ -1,161 +1,70 @@
-{% extends "layout.html" %}
-
-{% block content %}
+{% extends "layout.html" %} {% block content %}
 <div
-class="container-sm d-flex justify-content-center align-items-center"
-style="height: 90vh"
+  class="container-sm d-flex justify-content-center align-items-center"
+  style="height: 90vh"
 >
-<form
-  method="post"
-  action=""
-  style="margin-top: 5em; margin-bottom: auto; margin-bottom: auto"
-  class="form-outline w-50"
->
-  {{ form.hidden_tag() }}
-  <img
-    class="mb-4"
-    src="{{ url_for('static', filename = '/musical-note.png') }}"
-    alt="Logo"
-    width="90"
-    height="90"
-    style="display: block; margin-left: auto; margin-right: auto"
-  />
-  <h1 class="h3 mb-3 font-weight-normal">Register Today!</h1>
-  <div class="mb-3">
-    <label for="exampleFormControlInput1" class="form-label"
-      >{{ form.name.label }}</label
-    >
-    {% if form.name.errors %} 
-      {{ form.name(class="form-control") }} 
-        <div class="text-danger">{{ form.name.errors[0] }}</div>
-    {% else %} 
-          {{ form.name(class="form-control") }} 
-    {% endif %}
-  </div>
-  <div class="mb-3">
-    <label for="exampleFormControlInput1" class="form-label"
-      >{{ form.email.label }}</label
-    >
-    {% if form.email.errors %} 
-      {{ form.email(class="form-control", type='email') }} 
-        <div class="text-danger">{{ form.email.errors[0] }}</div>
-    {% else %} 
-          {{ form.email(class="form-control") }} 
-    {% endif %}
-  </div>
-  <div class="mb-3">
-    <label for="exampleFormControlInput1" class="form-label"
-      >{{ form.username.label }}</label
-    >
-    {% if form.username.errors %} 
-      {{ form.username(class="form-control") }} 
-        <div class="text-danger">{{ form.username.errors[0] }}</div>
-    {% else %} 
-          {{ form.username(class="form-control") }} 
-    {% endif %}
-    <div id="passwordHelpBlock" class="form-text">
-        <small>Your username must be 8-20 characters long and can contain letters, numbers and underscore.</small>
-      </div>
-  </div>
-  <div class="mb-3">
-    <label for="inputPassword5" class="form-label"
-      >{{ form.password.label }}</label
-    >
-    {{ form.password(class="form-control") }}
-    <div id="passwordHelpBlock" class="form-text"><small>Your password must be 8-20 characters long, contain letters and numbers,
-        and must not contain spaces, special characters, or emoji.</small>
-    
+  <form
+    method="post"
+    action=""
+    style="margin-top: 5em; margin-bottom: auto; margin-bottom: auto"
+    class="form-outline w-50"
+  >
+    {{ form.hidden_tag() }}
+    <img
+      class="mb-4"
+      src="{{ url_for('static', filename = '/musical-note.png') }}"
+      alt="Logo"
+      width="90"
+      height="90"
+      style="display: block; margin-left: auto; margin-right: auto"
+    />
+    <h1 class="h3 mb-3 font-weight-normal">Register Today!</h1>
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label"
+        >{{ form.name.label }}</label
+      >
+      {% if form.name.errors %} {{ form.name(class="form-control") }}
+      <div class="text-danger">{{ form.name.errors[0] }}</div>
+      {% else %} {{ form.name(class="form-control") }} {% endif %}
     </div>
-  </div>
-  <div class="mb-3">
-    <label for="exampleFormControlInput1" class="form-label"
-      >{{ form.confirm_password.label }}</label
-    >
-    {% if form.confirm_password.errors %} 
-      {{ form.confirm_password(class="form-control") }} 
-        <div class="text-danger">{{ form.confirm_password.errors[0] }}</div>
-    {% else %} 
-          {{ form.confirm_password(class="form-control") }} 
-    {% endif %}
-  </div>
-  <div>{{ form.submit(class="btn btn-primary my-3") }}</div>
-</form>
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label"
+        >{{ form.username.label }}</label
+      >
+      {% if form.username.errors %} {{ form.username(class="form-control") }}
+      <div class="text-danger">{{ form.username.errors[0] }}</div>
+      {% else %} {{ form.username(class="form-control") }} {% endif %}
+      <div id="passwordHelpBlock" class="form-text">
+        <small
+          >Your username must be 8-20 characters long and can contain letters,
+          numbers and underscore.</small
+        >
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="inputPassword5" class="form-label"
+        >{{ form.password.label }}</label
+      >
+      {{ form.password(class="form-control") }}
+      <div id="passwordHelpBlock" class="form-text">
+        <small
+          >Your password must be 8-20 characters long, contain letters and
+          numbers, and must not contain spaces, special characters, or
+          emoji.</small
+        >
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label"
+        >{{ form.confirm_password.label }}</label
+      >
+      {% if form.confirm_password.errors %} {{
+      form.confirm_password(class="form-control") }}
+      <div class="text-danger">{{ form.confirm_password.errors[0] }}</div>
+      {% else %} {{ form.confirm_password(class="form-control") }} {% endif %}
+    </div>
+    <div>{{ form.submit(class="btn btn-primary my-3") }}</div>
+  </form>
 </div>
 
-
 {% endblock content %}
-
-
-    <!-- <form method="post" action="">
-
-        {{ form.hidden_tag() }}
-
-        <div>
-            {{ form.name.label }}
-
-            {% if form.name.errors %}
-                {{ form.name() }}
-                {% for error in form.name.errors %}
-                    {{ error }}  
-                {% endfor %}
-            {% else %}
-                {{ form.name() }}
-            {% endif %}  
-        </div>
-        <div>
-            {{ form.email.label }}
-
-            {% if form.email.errors %}
-                {{ form.email() }}
-                {% for error in form.email.errors %}
-                    {{ error }}  
-                {% endfor %}
-            {% else %}
-                {{ form.email() }}
-            {% endif %}  
-        </div>
-        <div>
-            {{ form.username.label }}
-
-            {% if form.username.errors %}
-                {{ form.username() }}
-                {% for error in form.username.errors %}
-                    {{ error }}  
-                {% endfor %}
-            {% else %}
-                {{ form.username() }}
-            {% endif %}
-        </div>
-        <div>
-            {{ form.password.label }}
-
-            {% if form.password.errors %}
-                {{ form.password() }}
-                {% for error in form.password.errors %}
-                    {{ error }}  
-                {% endfor %}
-            {% else %}
-                {{ form.password() }}
-            {% endif %}
-        </div>
-        <div>
-            {{ form.confirm_password.label }}
-
-            {% if form.confirm_password.errors %}
-                {{ form.confirm_password() }}
-                {% for error in form.confirm_password.errors %}
-                    {{ error }}  
-                {% endfor %}
-            {% else %}
-                {{ form.confirm_password() }}
-            {% endif %}
-        </div>
-        <div>
-            {{ form.submit() }}
-        </div>
-    </form> 
-
-    <div>
-        Already have an account? <a href={{ url_for('login') }}>Sign In</a>
-    </div> -->
-

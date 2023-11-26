@@ -1,7 +1,9 @@
-from musicapp import app
-from flask import render_template, url_for, flash, redirect
+from musicapp import app, db
+from flask import render_template, url_for, flash, redirect, request
 from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UploadForm, CreatePlayListForm
 from musicapp.models import User, Song
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, logout_user, current_user, login_required
 
 
 @app.route('/')
@@ -11,20 +13,41 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        flash(f'Account created for {form.username.data}', 'success')
-        return redirect(url_for('index'))
+        hashed_password = generate_password_hash(form.password.data)
+        user = User(name=form.name.data, username=form.username.data, password_hash=hashed_password)
+        db.session.add(user)
+        db.session.commit()
+        flash(message=f'Account successfully created for {form.name.data}. You can now log in.', category='success')
+        return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
-        flash(f'You are now logged in as {form.username.data}', 'success')
-        return redirect(url_for('userhome'))
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and check_password_hash(user.password_hash, form.password.data):
+            login_user(user, remember=form.remember.data)
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('home'))
+            # flash(f'Login successful. You are now logged in as {form.username.data}', 'success')
+            # return redirect(url_for('home'))
+        else:
+            flash(f'Login unsuccessful. Incorrect username or password.', 'danger')
     return render_template('login.html', title='Login', form=form)
+
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 
 @app.route('/admin_login', methods=['GET', 'POST'])
@@ -41,6 +64,7 @@ def admin_login():
 
 
 @app.route('/home')
+@login_required
 def home():
     return render_template('home.html')
 
@@ -66,7 +90,7 @@ def play_song():
 @app.route('/create_playlist')
 def create_playlist():
     form = CreatePlayListForm()
-    return render_template('create_playlist.html', form=form)\
+    return render_template('create_playlist.html', form=form)
     
 @app.route('/admin_options')
 def admin_options():
