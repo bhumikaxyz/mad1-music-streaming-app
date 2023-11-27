@@ -1,5 +1,6 @@
+import os
 from musicapp import app, db
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, session
 from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UploadForm, CreatePlayListForm
 from musicapp.models import User, Song
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -66,32 +67,62 @@ def admin_login():
 @app.route('/home')
 @login_required
 def home():
-    return render_template('home.html')
+    return render_template('home.html', songs=Song.query.all())
 
 @app.route('/register_creator')
 def register_creator():
     return render_template('register_creator.html')
 
-@app.route('/upload_song')
+
+@app.route('/upload_song', methods=['GET', 'POST'])
 def upload_song():
     form = UploadForm()
+    if request.method == 'POST':
+        file = request.files['file']
+        if file:
+            filename = file.filename
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-    if form.validate_on_submit():
-        flash(f'{form.title.data} has been uploaded successfully', 'success')
-        return redirect(url_for('home'))
+            song = Song(filename=filename)
+            db.session.add(song)
+            db.session.commit()
+            return redirect(url_for('home'))
+
+    # if form.validate_on_submit():
+    #     flash(f'{form.title.data} has been uploaded successfully', 'success')
+    #     return redirect(url_for('home'))
     
     return render_template('upload_song.html', form=form)
 
 
-@app.route('/play_song')
-def play_song():
-    return render_template('play_song.html')
+@app.route('/play/<int:song_id>')
+def play_song(song_id):
+    song = Song.query.get_or_404(song_id)
+    # try:
+    # lyrics = url_for('static', filename='lyrics/' + song.title + '.txt')
+    lyrics = f"D:\Study Resources\IITM OD\mad1_project\musicapp\static\lyrics\{song.title}.txt"
+    with open(lyrics, 'r') as file:
+        file_content = file.read()
+    # except:
+    #     file_content = 'Lyrics not available.'        
+    return render_template('play_song.html', song=song, file_content=file_content)
 
 @app.route('/create_playlist')
 def create_playlist():
     form = CreatePlayListForm()
     return render_template('create_playlist.html', form=form)
     
+
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    return render_template('admin_dashboard.html')
+
+
 @app.route('/admin_options')
 def admin_options():
     return render_template('admin_options.html')
+
+
+@app.route('/creator_dashboard')
+def creator_dashboard():
+    return render_template('creator_dashboard.html')

@@ -33,7 +33,7 @@ class AdminLoginForm(FlaskForm):
 
 class UploadForm(FlaskForm):
     title = StringField('Song Title', validators=[DataRequired()])
-    path = StringField('File Path', validators=[DataRequired()])
+    file = FileField('File', validators=[DataRequired()])
     duration = TimeField('Duration')
     genre = SelectField('Genre', default='Other')
     lyrics = TextAreaField('Lyrics')
@@ -41,6 +41,7 @@ class UploadForm(FlaskForm):
 
 class CreatePlayListForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(max=100)])
+    
     submit = SubmitField('Add Songs') 
 
 

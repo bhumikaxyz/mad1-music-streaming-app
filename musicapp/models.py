@@ -13,9 +13,9 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(100), nullable = False)
     username = db.Column(db.String(20), unique = True, nullable = False)
     password_hash = db.Column(db.String(50), nullable = False)
-    profile_image = db.Column(db.String(20), nullable = True, default = 'default_image.jpg')
     is_creator = db.Column(db.Boolean, default = False)
     is_flagged = db.Column(db.Boolean, default = False )
+
     playlists = db.relationship('Playlist', backref = 'user', lazy = True)
     interactions = db.relationship('Interactions', backref = 'user', lazy = True)
 
@@ -32,14 +32,15 @@ playlist_song = db.Table('playlist_song',
 class Song(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100), unique = True, nullable = False)
-    path = db.Column(db.String(100), unique =True, nullable = False)
+    filename = db.Column(db.String(100), unique =True, nullable = False)
     duration = db.Column(db.Time, nullable = True)
     lyrics = db.Column(db.Text, unique = True, nullable = True)
-    genre = db.Column(db.Enum('Pop', 'Metal', 'Other'), nullable = False, default = 'Other')
+    genre = db.Column(db.Enum('Pop', 'Metal', 'Other'), nullable = True, default = 'Other')
     album_id = db.Column(db.Integer, db.ForeignKey('album.id'), nullable = False)
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable = False)
-    uploaded_at = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
+    timestamp = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
+
+    
     interactions = db.relationship('Interactions', backref = 'song', lazy = True)
 
     def __repr__(self):
@@ -50,10 +51,8 @@ class Album(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(50), unique = True, nullable = False)
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable = False)
-    cover_image = db.Column(db.String(20), nullable = False, default = 'default_image.jpg')
-    songs = db.relationship('Song', backref = 'album', lazy = True)
-    created_at = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default = datetime.utcnow)
+    
 
     def __repr__(self):
         return f'Album {self.name}'
@@ -62,12 +61,12 @@ class Album(db.Model):
 class Artist(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(50), nullable = False)
-    profile_image = db.Column(db.String(20), nullable = False, default = 'default_image.jpg')
+
     songs = db.relationship('Song', backref = 'artist', lazy = True)
     albums = db.relationship('Album', backref = 'artist', lazy = True) 
 
     def __repr__(self):
-        return f'Artist {self.name}'
+        return f'{self.name}'
 
 
 class Playlist(db.Model):
@@ -75,9 +74,8 @@ class Playlist(db.Model):
     name = db.Column(db.String(50), nullable = False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     songs = db.relationship('Song', secondary = playlist_song, backref = 'playlists')
-    display_image = db.Column(db.String(20), nullable = False, default = 'default_image.jpg')
-    created_at = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
+    timestamp = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
+    
 
     def __repr__(self):
         return f'Playlist {self.name}'

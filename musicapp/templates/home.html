@@ -1,31 +1,45 @@
 {% extends "layout.html" %} {% block content %}
 
 <div class="container py-4">
-  <h6 class="display-6">Hi, {{  current_user.name  }}</h6>
+  <p class="lead"><strong>Hi, {{  current_user.name  }}!</strong></p>
   <div class="container">
-    <h2>All Tracks</h2>
+    <div class="container d-flex justify-content-between align-items-center">
+      <h2>All Tracks</h2>
+      <div class="dropdown">
+      <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">Filter</button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">Artist</a></li>
+          <li><a class="dropdown-item" href="#">Rating</a></li>
+          <li><a class="dropdown-item" href="#">Genre</a></li>
+        </ul>
+    </div>
+    
+    </div>
+    
 
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
+      {% for song in songs %}
       <div class="col">
         <div class="card shadow-sm bg-primary-subtle">
           <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-1 shadow-sm mx-auto" alt="song" width="200 px" height="200 px";>
           <div class="card-body">
             <p class="card-text">
-              <p class="mb-0">Song Name</p>
-              <p><small>Artist Name</small></p>
+              <p class="mb-0">{{ song.title }}</p>
+              <p><small>{{ song.artist }}</small></p>
             </p>
             <div class="d-flex justify-content-between align-items-center">
               <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-outline-secondary">
+                <a type="button" class="btn btn-sm btn-outline-secondary" href="{{  url_for('play_song', song_id=song.id)  }}">
                   Play
-                </button>
+                </a>
               </div>
-              <small class="text-body-secondary">9 mins</small>
+              <small class="text-body-secondary">{{ song.duration }}</small>
             </div>
           </div>
         </div>
       </div>
-      <div class="col">
+      {% endfor %}
+      <!-- <div class="col">
         <div class="card shadow-sm bg-primary-subtle">
           <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-1 shadow-sm mx-auto" alt="song" width="200 px" height="200 px";>
           <div class="card-body">
@@ -123,9 +137,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
-  </div>
-</div>
-
+  
 {% endblock content %}

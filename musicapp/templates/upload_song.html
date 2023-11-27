@@ -8,9 +8,10 @@
 >
   <form
     method="post"
-    action=""
-    style="margin-top: 5em; margin-bottom: auto; margin-bottom: auto"
-    class="form-outline w-50"
+    action="{{  url_for('home')  }}"
+    style="margin-top: 2em; margin-bottom: auto; margin-bottom: auto"
+    class="form-outline w-50" 
+    enctype="multipart/form-data"
   >
     {{ form.hidden_tag() }}
 
@@ -30,18 +31,21 @@
     </div>
 
     <div class="mb-3">
+      <label for="formFile" class="form-label">Browse</label>
+      <input class="form-control" type="file" accept=".mp3" id="formFile">
+    </div>
+    <!-- <div class="mb-3">
       <label for="exampleFormControlInput1" class="form-label"
         >{{ form.path.label }}</label
       >
       {% if form.path.errors %} {{ form.path(class="form-control") }}
       <div class="text-danger">{{ form.path.errors[0] }}</div>
       {% else %} {{ form.path(class="form-control") }} {% endif %}
-    </div>
+    </div> -->
 
     <div class="mb-3">
       <label for="exampleFormControlInput1" class="form-label"
-        >{{ form.duration.label }}</label
-      >
+        >{{ form.duration.label }}</label>
       {% if form.duration.errors %} 
         {{ form.duration(class="form-control") }} 
           <div class="text-danger">{{ form.duration.errors[0] }}</div>
