@@ -1,7 +1,7 @@
 import os
 from musicapp import app, db
 from flask import render_template, url_for, flash, redirect, request, session
-from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UploadForm, CreatePlayListForm
+from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UpdateProfileForm, UploadForm, CreatePlayListForm
 from musicapp.models import User, Song
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, current_user, login_required
@@ -55,7 +55,7 @@ def logout():
 def admin_login():
     form = AdminLoginForm()
     if form.validate_on_submit():
-        if form.username.data == 'admin' and form.password.data == 'admin123':
+        if form.username.data == 'admin' and form.password.data == 'admin':
             flash(f'You are now logged in as {form.username.data}', 'success')
             return redirect(url_for('home'))
         else:
@@ -68,6 +68,30 @@ def admin_login():
 @login_required
 def home():
     return render_template('home.html', songs=Song.query.all())
+
+@app.route('/profile', methods = ['GET', 'POST'])
+@login_required
+def profile():
+    form = UpdateProfileForm()
+
+    if request.method == 'GET':
+            form.name.data = current_user.name
+            form.username.data = current_user.username
+
+    if form.validate_on_submit():
+        if check_password_hash(current_user.password_hash, form.current_password.data):
+            current_user.name = form.name.data
+            current_user.username = form.username.data
+            hashed_password = generate_password_hash(form.password.data)
+            current_user.password_hash = hashed_password
+            db.session.commit()
+            flash('Your account has been updated!', 'success')
+            return redirect(url_for('home'))
+        else:    
+            flash('Incorrect password', 'danger')
+            return redirect(url_for('profile'))
+        
+    return render_template('profile.html', form=form)    
 
 @app.route('/register_creator')
 def register_creator():

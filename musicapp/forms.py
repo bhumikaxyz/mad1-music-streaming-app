@@ -1,8 +1,10 @@
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, PasswordField, SubmitField, TextAreaField, FileField, TimeField, SelectField, ValidationError
+from wtforms import StringField, BooleanField, PasswordField, SubmitField, TextAreaField, FileField, TimeField, SelectField, SelectMultipleField, ValidationError
+from flask_wtf.file import FileAllowed
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from musicapp.models import User
+from flask_login import current_user
 
 
 class RegistrationForm(FlaskForm):
@@ -31,6 +33,21 @@ class AdminLoginForm(FlaskForm):
     submit = SubmitField('Login')    
     
 
+class UpdateProfileForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(max=100)])
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+    current_password = PasswordField('Current Password', validators=[DataRequired(), Length(max=50)])
+    password = PasswordField('New Password', validators=[DataRequired(), EqualTo('current_password')])
+    submit = SubmitField('Update')
+
+    def validate_username(self, username):
+        if username.data != current_user.username:
+            user = User.query.filter_by(username=username.data).first()
+            if user:
+                raise ValidationError('This username is taken. Kindly choose a different one.')
+
+
+
 class UploadForm(FlaskForm):
     title = StringField('Song Title', validators=[DataRequired()])
     file = FileField('File', validators=[DataRequired()])
@@ -41,7 +58,7 @@ class UploadForm(FlaskForm):
 
 class CreatePlayListForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(max=100)])
-    
+    songs = SelectMultipleField('Songs', validators=[DataRequired()])
     submit = SubmitField('Add Songs') 
 
 
