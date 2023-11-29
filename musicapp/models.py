@@ -33,9 +33,9 @@ playlist_song = db.Table('playlist_song',
 class Song(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100), unique = True, nullable = False)
-    filename = db.Column(db.String(100), unique =True, nullable = False)
+    filename = db.Column(db.String(100), unique =True)
     duration = db.Column(db.Time, nullable = True)
-    lyrics = db.Column(db.Text, unique = True, nullable = True)
+    lyrics = db.Column(db.Text)
     album_id = db.Column(db.Integer, db.ForeignKey('album.id'), nullable = False)
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable = False)
     timestamp = db.Column(db.DateTime(), server_default = func.now())
@@ -44,7 +44,7 @@ class Song(db.Model):
     interactions = db.relationship('Interactions', backref = 'song', lazy = True)
 
     def __repr__(self):
-        return f'Song {self.title}'
+        return f'{self.title}'
     
 
 class Album(db.Model):

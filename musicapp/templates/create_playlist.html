@@ -1,69 +1,56 @@
-{% extends "layout.html" %} 
-{% block content %}
+{% extends "layout.html" %} {% block content %}
 <div
   class="container-sm d-flex justify-content-center align-items-center"
-  style="height: 90vh">
-
+  style="height: 90vh"
+>
   <form
-  method="post"
-  action=""
-  style="margin-top: 5em; margin-bottom: auto; margin-bottom: auto"
-  class="form-outline w-50">
+    method="post"
+    action=""
+    style="margin-top: 2em; margin-bottom: auto; margin-bottom: auto"
+    class="form-outline w-50"
+  >
     {{ form.hidden_tag() }}
 
-    <h3 class="h3 mb-3 font-weight-normal text-center">Create a Playlist</h3>
+    <legend><h2 class="h2 mb-3 font-weight-normal text-center">{{ legend }}</h2></legend>
 
     <div class="mb-3">
-        <p class="lead text-center">
-          Club your favourite songs together in a playlist.
-        </p>
-      </div>
-  
-
-    <div class="mb-3">
-        <label for="exampleFormControlInput1" class="form-label"
-          >{{ form.name.label }}</label
-        >
-        {% if form.name.errors %} 
-          {{ form.name(class="form-control") }} 
-            <div class="text-danger">{{ form.name.errors[0] }}</div>
-        {% else %} 
-              {{ form.name(class="form-control") }} 
-        {% endif %}
+      <p class="lead text-center">
+        Club your favourite songs together in a playlist.
+      </p>
     </div>
 
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-        <label class="form-check-label" for="flexCheckDefault">
-          Song 1
-        </label>
+    {% if songs | length == 0 %}
+    <p class="text-center">No records found</p>
+    {% else %}
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label"
+        >{{ form.name.label }}</label
+      >
+      {% if form.name.errors %} {{ form.name(class="form-control") }}
+      <div class="text-danger">{{ form.name.errors[0] }}</div>
+      {% else %} {{ form.name(class="form-control") }} {% endif %}
+    </div>
+
+    <div class="form-group">
+      {{ form.songs.label(class="form-control-label") }} {% for choice in
+      form.songs %}
+      <div class="form-check">
+        <input
+          type="checkbox"
+          id="{{ choice.id }}"
+          name="{{ form.songs.name }}"
+          value="{{ choice.data }}"
+          class="form-check-input"
+        />
+        <label for="{{ choice.id }}" class="form-check-label"
+          >{{ choice.label.text }}</label
+        >
       </div>
-
-
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-        <label class="form-check-label" for="flexCheckDefault">
-          Song 2
-        </label>
-      </div> 
-      
-      
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-        <label class="form-check-label" for="flexCheckDefault">
-          Song 3
-        </label>
-      </div>  
-
+      {% endfor %}
+    </div>
     <div>{{ form.submit(class="btn btn-primary my-3") }}</div>
-
-</div>    
-
+    {% endif %}
   </form>
-
-  
-
-
-></div>
+</div>
 
 {% endblock content %}

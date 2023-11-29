@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, PasswordField, SubmitField, TextAreaField, FileField, TimeField, SelectField, SelectMultipleField, ValidationError
+from wtforms import StringField, BooleanField, PasswordField, SubmitField, TextAreaField, FileField, TimeField, SelectField, SelectMultipleField, ValidationError, widgets
 from flask_wtf.file import FileAllowed
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from musicapp.models import User
@@ -56,9 +56,9 @@ class UploadForm(FlaskForm):
     lyrics = TextAreaField('Lyrics')
     submit = SubmitField('Upload')
 
-class CreatePlayListForm(FlaskForm):
+class CreatePlaylistForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(max=100)])
-    songs = SelectMultipleField('Songs', validators=[DataRequired()])
+    songs = SelectMultipleField('Songs', coerce=int, validators=[DataRequired()], widget=widgets.ListWidget(prefix_label=False), option_widget=widgets.CheckboxInput())
     submit = SubmitField('Add Songs') 
 
 

@@ -1,8 +1,8 @@
 import os
 from musicapp import app, db
-from flask import render_template, url_for, flash, redirect, request, session
-from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UpdateProfileForm, UploadForm, CreatePlayListForm
-from musicapp.models import User, Song
+from flask import render_template, url_for, flash, redirect, request, abort
+from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UpdateProfileForm, UploadForm, CreatePlaylistForm
+from musicapp.models import User, Song, Playlist, Album, Artist, Interactions
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, current_user, login_required
 
@@ -119,23 +119,8 @@ def upload_song():
     return render_template('upload_song.html', form=form)
 
 
-@app.route('/play/<int:song_id>')
-def play_song(song_id):
-    song = Song.query.get_or_404(song_id)
-    # try:
-    # lyrics = url_for('static', filename='lyrics/' + song.title + '.txt')
-    lyrics = f"D:\Study Resources\IITM OD\mad1_project\musicapp\static\lyrics\{song.title}.txt"
-    with open(lyrics, 'r') as file:
-        file_content = file.read()
-    # except:
-    #     file_content = 'Lyrics not available.'        
-    return render_template('play_song.html', song=song, file_content=file_content)
 
-@app.route('/create_playlist')
-def create_playlist():
-    form = CreatePlayListForm()
-    return render_template('create_playlist.html', form=form)
-    
+
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
@@ -150,3 +135,81 @@ def admin_options():
 @app.route('/creator_dashboard')
 def creator_dashboard():
     return render_template('creator_dashboard.html')
+
+
+
+# ================================= Playlist CRUD ========================================
+
+@app.route('/playlist')
+def playlist():
+    playlists = Playlist.query.all()
+    return render_template('playlist.html', playlists = playlists)
+
+
+@app.route('/playlist/create', methods = ['GET','POST'])
+@login_required
+def create_playlist():
+    form = CreatePlaylistForm()
+    songs = Song.query.all()
+    form.songs.choices = [(song.id, song.title) for song in songs]
+    
+    if request.method == 'POST' and form.validate_on_submit():
+        playlist = Playlist(name = form.name.data)
+        playlist.user_id = current_user.id
+        selected_songs = form.songs.data
+        playlist.songs = Song.query.filter(Song.id.in_(selected_songs)).all()
+        db.session.add(playlist)
+        db.session.commit()
+        flash('Your playlist has been created', 'success')
+        return redirect(url_for('playlist'))
+    return render_template('create_playlist.html', form=form, songs=songs, legend='Create a Playlist')
+
+
+@app.route('/playlist/update/<int:playlist_id>', methods=['GET', 'POST'])
+@login_required
+def update_playlist(playlist_id):
+    playlist = Playlist.query.get_or_404(playlist_id)
+    form = CreatePlaylistForm()
+    form.name.data = playlist.name
+    songs = Song.query.all()
+    form.songs.choices = [(song.id, song.title) for song in songs]
+
+
+    if playlist.user_id != current_user.id:
+        abort(403)
+    else:
+        if request.method == 'POST' and form.validate_on_submit():
+            selected_songs = form.songs.data
+            playlist.songs = Song.query.filter(Song.id.in_(selected_songs)).all()
+            db.session.add(playlist)
+            db.session.commit()
+            flash('Your playlist has been created', 'success')
+            return redirect(url_for('playlist'))
+        
+    return render_template('create_playlist.html', form=form, songs=songs, playlist=playlist, legend='Update Post')
+
+@app.route('/playlist/delete/<int:playlist_id>', methods=['GET', 'POST'])
+@login_required
+def delete_playlist(playlist_id):
+    playlist = Playlist.query.get_or_404(playlist_id)
+    if playlist.user_id != current_user.id:
+        abort(403)
+    db.session.delete(playlist)
+    db.session.commit()
+    flash('Your playlist has been deleted', 'success')
+    return redirect(url_for('playlist'))
+
+
+#====================================== Song CRUD ===========================================
+
+
+@app.route('/play/<int:song_id>')
+def play_song(song_id):
+    song = Song.query.get_or_404(song_id)
+    try:
+        lyrics = f"D:\Study Resources\IITM OD\mad1_project\musicapp\static\lyrics\{song.title}.txt"
+        with open(lyrics, 'r') as file:
+            file_content = file.read()
+    except:
+        file_content = 'Lyrics not available.'        
+    return render_template('play_song.html', song=song, file_content=file_content)
