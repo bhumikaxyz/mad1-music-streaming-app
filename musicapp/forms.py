@@ -62,4 +62,9 @@ class CreatePlaylistForm(FlaskForm):
     submit = SubmitField('Add Songs') 
 
 
+class AlbumForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(max=100)])
+    genre = SelectField('Genre', choices=['Pop', 'Rock', 'Metal', 'Classical', 'Other'], validators=[DataRequired()])
+    songs = SelectMultipleField('Songs', coerce=int, validators=[DataRequired()], widget=widgets.ListWidget(prefix_label=False), option_widget=widgets.CheckboxInput())
+    submit = SubmitField('Add Songs') 
 

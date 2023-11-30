@@ -15,14 +15,8 @@
       <h2 class="h2 mb-3 font-weight-normal text-center">{{ legend }}</h2>
     </legend>
 
-    <div class="mb-3">
-      <p class="lead text-center">
-        Club your favourite songs together in a playlist.
-      </p>
-    </div>
-
     {% if songs | length == 0 %}
-    <p class="text-center">No records found</p>
+    <p class="text-center">No records found.</p>
     {% else %}
     <div class="mb-3">
       <label for="exampleFormControlInput1" class="form-label"
@@ -31,6 +25,17 @@
       {% if form.name.errors %} {{ form.name(class="form-control") }}
       <div class="text-danger">{{ form.name.errors[0] }}</div>
       {% else %} {{ form.name(class="form-control") }} {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label"
+        >{{ form.genre.label }}</label
+      >
+      <select class="form-control" id="{{ form.genre.id }}" name="{{ form.genre.name }}">
+        {% for label in form.genre.choices %}
+            <option value="{{ label }}" {% if label == form.genre.data %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
     </div>
 
     <div class="form-group">

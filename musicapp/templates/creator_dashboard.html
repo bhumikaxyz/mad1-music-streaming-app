@@ -1,71 +1,73 @@
 {% extends "layout.html" %} {% block content %}
 
 <div class="container pt-4 mb-5 justify-content-between align-items-center">
-    <h2>Creator Dashboard</h2>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-3 mt-2">
-        <div class="card border-primary mx-4" style="max-width: 20rem; height: 10rem;">
-            <div class="card-body">
-              <h5 class="card-title">Total Songs Uploaded</h5>
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            </div>
-          </div>
-
-          <div class="card border-primary mx-4" style="max-width: 20rem;">
-            <div class="card-body">
-              <h5 class="card-title">Average Rating of Songs</h5>
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            </div>
-          </div>
-
-          <div class="card border-primary mx-4" style="max-width: 20rem;">
-            <div class="card-body">
-              <h5 class="card-title">Total Albums Created</h5>
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            </div>
-          </div>
-
-
+  <h2>Creator Dashboard</h2>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-3 mt-2">
+    <div
+      class="card border-primary mx-4"
+      style="max-width: 20rem; height: 10rem"
+    >
+      <div class="card-body">
+        <h5 class="card-title">Total Songs Uploaded</h5>
+        <p class="card-text">
+          Some quick example text to build on the card title and make up the
+          bulk of the card's content.
+        </p>
+      </div>
     </div>
-</div>
-<div
-  class="container-sm d-flex justify-content-center align-items-center">
 
-  <table class="table table-bordered text-center">
-    <thead>
-      <tr>
-        <th scope="col">Album</th>
-        <th scope="col">Artist Name</th>
-        <th scope="col">Genre</th>
-        <th scope="col">Actions</th>
-      </tr>
-    </thead>
-    <tbody class="table-group-divider">
-      <tr>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
-        <td>
-          <button class="btn btn-success btn-sm">Add Songs</button> |
-          <button class="btn btn-primary btn-sm">Edit</button> |
-          <button class="btn btn-danger btn-sm">Delete</button>
-        </td>
-      </tr>
-      <tr>
-        <td>Jacob</td>
-        <td>Thornton</td>
-        <td>@fat</td>
-        <td>
-            <button class="btn btn-success btn-sm">Add Songs</button> |
-            <button class="btn btn-primary btn-sm">Edit</button> |
-            <button class="btn btn-danger btn-sm">Delete</button>
-          </td>
-      </tr>
-      <tr>
-        <td>Larry the Bird</td>
-        <td>@twitter</td>
-      </tr>
-    </tbody>
-  </table>
+    <div class="card border-primary mx-4" style="max-width: 20rem">
+      <div class="card-body">
+        <h5 class="card-title">Average Rating of Songs</h5>
+        <p class="card-text">
+          Some quick example text to build on the card title and make up the
+          bulk of the card's content.
+        </p>
+      </div>
+    </div>
+
+    <div class="card border-primary mx-4" style="max-width: 20rem">
+      <div class="card-body">
+        <h5 class="card-title">Total Albums Created</h5>
+        <p class="card-text">
+          Some quick example text to build on the card title and make up the
+          bulk of the card's content.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Your albums</h2>
+    <!-- <a href="{{  url_for('create_album') }}" class="btn btn-success">+ Add album</a> -->
+    <div class="container-sm d-flex">
+        {% if albums | length == 0 %}
+            <p class="lead">No records found.</p>
+        {% else %}
+            <table class="table table-bordered text-center">
+                <thead>
+                  <tr>
+                    <th scope="col">S. No.</th>
+                    <th scope="col">Album</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for album in albums %}
+                    <tr>
+                        <td>{{ album.id }}</td>
+                        <td>{{ album.name }}</td>
+                        <td>
+                            <a href="" class="btn btn-info btn-sm">View</a> |
+                            <a href="{{ url_for('update_album', album_id = album.id) }}" class="btn btn-primary btn-sm">Update</a> |
+                            <a href="{{ url_for('delete_album', album_id = album.id) }}" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor%}
+                </tbody>
+            </table>    
+
+        {% endif %}
+    </div>   
 </div>
 
 {% endblock content %}

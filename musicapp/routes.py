@@ -1,7 +1,7 @@
 import os
 from musicapp import app, db
 from flask import render_template, url_for, flash, redirect, request, abort
-from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UpdateProfileForm, UploadForm, CreatePlaylistForm
+from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UpdateProfileForm, UploadForm, CreatePlaylistForm, AlbumForm
 from musicapp.models import User, Song, Playlist, Album, Artist, Interactions
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, current_user, login_required
@@ -10,21 +10,6 @@ from flask_login import login_user, logout_user, current_user, login_required
 @app.route('/')
 def index():
     return render_template('index.html')
-
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data)
-        user = User(name=form.name.data, username=form.username.data, password_hash=hashed_password)
-        db.session.add(user)
-        db.session.commit()
-        flash(message=f'Account successfully created for {form.name.data}. You can now log in.', category='success')
-        return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -43,6 +28,21 @@ def login():
         else:
             flash(f'Login unsuccessful. Incorrect username or password.', 'danger')
     return render_template('login.html', title='Login', form=form)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    form = RegistrationForm()
+    if request.method=='POST' and form.validate_on_submit():
+        hashed_password = generate_password_hash(form.password.data)
+        user = User(name=form.name.data, username=form.username.data, password_hash=hashed_password)
+        db.session.add(user)
+        db.session.commit()
+        flash(message=f'Account successfully created for {form.name.data}. You can now log in.', category='success')
+        return redirect(url_for('login'))
+    return render_template('register.html', title='Register', form=form)
 
 
 @app.route('/logout', methods=['GET', 'POST'])
@@ -93,33 +93,16 @@ def profile():
         
     return render_template('profile.html', form=form)    
 
-@app.route('/register_creator')
+@app.route('/register_creator', methods = ['GET', 'POST'])
 def register_creator():
+    user = User.query.get_or_404(current_user.id)
+    if request.method == 'POST' and not user.is_creator:
+        user.is_creator = True
+        db.session.commit()  
+        flash('Account successfully upgraded to creator!', 'success')
+        return redirect(url_for('home'))  
+        
     return render_template('register_creator.html')
-
-
-@app.route('/upload_song', methods=['GET', 'POST'])
-def upload_song():
-    form = UploadForm()
-    if request.method == 'POST':
-        file = request.files['file']
-        if file:
-            filename = file.filename
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-            song = Song(filename=filename)
-            db.session.add(song)
-            db.session.commit()
-            return redirect(url_for('home'))
-
-    # if form.validate_on_submit():
-    #     flash(f'{form.title.data} has been uploaded successfully', 'success')
-    #     return redirect(url_for('home'))
-    
-    return render_template('upload_song.html', form=form)
-
-
-
 
 
 @app.route('/admin_dashboard')
@@ -130,11 +113,6 @@ def admin_dashboard():
 @app.route('/admin_options')
 def admin_options():
     return render_template('admin_options.html')
-
-
-@app.route('/creator_dashboard')
-def creator_dashboard():
-    return render_template('creator_dashboard.html')
 
 
 
@@ -165,11 +143,11 @@ def create_playlist():
     return render_template('create_playlist.html', form=form, songs=songs, legend='Create a Playlist')
 
 
-@app.route('/playlist/update/<int:playlist_id>', methods=['GET', 'POST'])
+@app.route('/playlist/update/<int:album_id>', methods=['GET', 'POST'])
 @login_required
 def update_playlist(playlist_id):
     playlist = Playlist.query.get_or_404(playlist_id)
-    form = CreatePlaylistForm()
+    form = AlbumForm()
     form.name.data = playlist.name
     songs = Song.query.all()
     form.songs.choices = [(song.id, song.title) for song in songs]
@@ -200,7 +178,52 @@ def delete_playlist(playlist_id):
     return redirect(url_for('playlist'))
 
 
-#====================================== Song CRUD ===========================================
+#======================================== Albums CRUD ============================================
+
+@app.route('/creator_dashboard')
+@login_required
+def creator_dashboard():
+    albums = Album.query.all()
+    return render_template('creator_dashboard.html', albums = albums)
+
+
+@app.route('/album/update/<int:album_id>', methods=['GET', 'POST'])
+@login_required
+def update_album(album_id):
+    album = Album.query.get_or_404(album_id)
+    form = AlbumForm()
+    form.name.data = album.name
+    form.genre.data = album.genre
+    songs = album.songs.all()
+    form.songs.choices = [(song.id, song.title) for song in songs]
+    # if album.user_id != current_user.id:
+    #     abort(403)
+    # else:
+    if request.method == 'POST' and form.validate_on_submit():
+        selected_songs = form.songs.data
+        album.songs = Song.query.filter(Song.id.in_(selected_songs)).all()
+        db.session.add(album)
+        db.session.commit()
+        flash('Your playlist has been created', 'success')
+        return redirect(url_for('creator_dashboard'))
+        
+    return render_template('update_album.html', form=form, songs=songs, album=album, legend='Update Album')
+
+
+@app.route('/album/delete/<int:album_id>', methods=['GET', 'POST'])
+@login_required
+def delete_album(album_id):
+    album = Album.query.get_or_404(album_id)
+    # if album.user_id != current_user.id:
+    #     abort(403)
+    db.session.delete(album)
+    db.session.commit()
+    flash('Album has been deleted', 'success')
+    return redirect(url_for('creator_dashboard'))
+
+
+
+#====================================== Song CRUD ===================================================
 
 
 @app.route('/play/<int:song_id>')
@@ -213,3 +236,24 @@ def play_song(song_id):
     except:
         file_content = 'Lyrics not available.'        
     return render_template('play_song.html', song=song, file_content=file_content)
+
+
+@app.route('/upload_song', methods=['GET', 'POST'])
+def upload_song():
+    form = UploadForm()
+    if request.method == 'POST':
+        file = request.files['file']
+        if file:
+            filename = file.filename
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+            song = Song(filename=filename)
+            db.session.add(song)
+            db.session.commit()
+            return redirect(url_for('home'))
+
+    # if form.validate_on_submit():
+    #     flash(f'{form.title.data} has been uploaded successfully', 'success')
+    #     return redirect(url_for('home'))
+    
+    return render_template('upload_song.html', form=form)

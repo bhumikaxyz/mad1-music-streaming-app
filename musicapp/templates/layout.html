@@ -47,17 +47,25 @@
         <div class="collapse navbar-collapse navbar-nav me-auto mb-2 mb-lg-0 d-flex justify-content-between align-items-center"  id="navbarSupportedContent">
 
           {% if current_user.is_authenticated %}
+            {% if current_user.is_creator %}
+            <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('creator_dashboard') }}">Dashboard</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('playlist') }}">Your Playlists</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('profile') }}">Profile</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
                 <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
                 <a class="nav-link active" aria-current="page" href="{{ url_for('register_creator') }}">Creator Account</a>
                 <a class="nav-link active" aria-current="page" href="{{ url_for('playlist') }}">Your Playlists</a>
                 <a class="nav-link active" aria-current="page" href="{{ url_for('profile') }}">Profile</a>
                 <a class="nav-link active" aria-current="page" href="{{ url_for('logout') }}">Logout</a>
                 <!-- <div class="container ml-auto"> -->
-                <form class="d-flex" role="search">
+                <!-- <form class="d-flex" role="search">
                   <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                   <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
+                </form> -->
               <!-- </div> -->
+              {% endif %}
           {% else %}
                 <a class="nav-item nav-link active" aria-current="page" href="{{ url_for('admin_login') }}">Admin Login</a>
           {% endif %}
