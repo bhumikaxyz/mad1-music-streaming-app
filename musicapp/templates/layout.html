@@ -45,7 +45,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse navbar-nav me-auto mb-2 mb-lg-0 d-flex justify-content-between align-items-center"  id="navbarSupportedContent">
-
+          <div class="ms-auto d-flex mx-5">
           {% if current_user.is_authenticated %}
             {% if current_user.is_creator %}
             <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
@@ -69,7 +69,7 @@
           {% else %}
                 <a class="nav-item nav-link active" aria-current="page" href="{{ url_for('admin_login') }}">Admin Login</a>
           {% endif %}
-
+        </div>        
         </div>
       </div>
     </nav>

@@ -54,7 +54,7 @@ class Album(db.Model):
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable = False)
     timestamp = db.Column(db.DateTime, server_default=func.now())
 
-    songs = db.relationship('Song', backref = 'artist', lazy = True)
+    songs = db.relationship('Song', backref = 'album', lazy = True)
     
     def __repr__(self):
         return f'Album {self.name}'

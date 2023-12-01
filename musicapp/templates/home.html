@@ -4,6 +4,11 @@
   <div class="container">
     <div class="container d-flex justify-content-between align-items-center">
       <h2>All Tracks</h2>
+
+      {% if current_user.is_creator %}
+        <a href="{{  url_for('create_song') }}" class="btn btn-success">+ Add Song</a>
+      {% endif %}
+
       <div class="dropdown">
       <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">Filter</button>
         <ul class="dropdown-menu">
@@ -31,6 +36,15 @@
                 <a type="button" class="btn btn-sm btn-outline-secondary" href="{{  url_for('play_song', song_id=song.id)  }}">
                   Play
                 </a>
+                {% if current_user.is_creator %}
+                  <a type="button" class="btn btn-sm btn-outline-secondary" href="{{  url_for('update_song', song_id=song.id)  }}">
+                    Edit
+                  </a>
+                  <a type="button" class="btn btn-sm btn-outline-secondary" href="{{  url_for('delete_song', song_id=song.id)  }}">
+                    Delete
+                  </a>
+
+                {% endif %}
               </div>
               <small class="text-body-secondary">{{ song.duration }}</small>
             </div>

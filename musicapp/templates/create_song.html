@@ -34,14 +34,7 @@
       <label for="formFile" class="form-label">Browse</label>
       <input class="form-control" type="file" accept=".mp3" id="formFile">
     </div>
-    <!-- <div class="mb-3">
-      <label for="exampleFormControlInput1" class="form-label"
-        >{{ form.path.label }}</label
-      >
-      {% if form.path.errors %} {{ form.path(class="form-control") }}
-      <div class="text-danger">{{ form.path.errors[0] }}</div>
-      {% else %} {{ form.path(class="form-control") }} {% endif %}
-    </div> -->
+
 
     <div class="mb-3">
       <label for="exampleFormControlInput1" class="form-label"
@@ -52,17 +45,6 @@
       {% else %} 
             {{ form.duration(class="form-control") }} 
       {% endif %}
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label"
-        >{{ form.genre.label }}</label>
-      <select class="form-select"> 
-        <option selected>Other</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
-      </select>
     </div>
 
     <div class="mb-3">

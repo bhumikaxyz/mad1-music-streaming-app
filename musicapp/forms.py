@@ -47,16 +47,7 @@ class UpdateProfileForm(FlaskForm):
                 raise ValidationError('This username is taken. Kindly choose a different one.')
 
 
-
-class UploadForm(FlaskForm):
-    title = StringField('Song Title', validators=[DataRequired()])
-    file = FileField('File', validators=[DataRequired()])
-    duration = TimeField('Duration')
-    genre = SelectField('Genre', default='Other')
-    lyrics = TextAreaField('Lyrics')
-    submit = SubmitField('Upload')
-
-class CreatePlaylistForm(FlaskForm):
+class PlaylistForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(max=100)])
     songs = SelectMultipleField('Songs', coerce=int, validators=[DataRequired()], widget=widgets.ListWidget(prefix_label=False), option_widget=widgets.CheckboxInput())
     submit = SubmitField('Add Songs') 
@@ -68,3 +59,9 @@ class AlbumForm(FlaskForm):
     songs = SelectMultipleField('Songs', coerce=int, validators=[DataRequired()], widget=widgets.ListWidget(prefix_label=False), option_widget=widgets.CheckboxInput())
     submit = SubmitField('Add Songs') 
 
+class SongForm(FlaskForm):
+    title = StringField('Song Title', validators=[DataRequired()])
+    file = FileField('File', validators=[DataRequired()])
+    duration = TimeField('Duration')
+    lyrics = TextAreaField('Lyrics')
+    submit = SubmitField('Upload')
