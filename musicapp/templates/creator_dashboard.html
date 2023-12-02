@@ -56,7 +56,7 @@
                         <td>{{ album.id }}</td>
                         <td>{{ album.name }}</td>
                         <td>
-                            <a href="" class="btn btn-info btn-sm">View</a> |
+                            <a href="{{ url_for('view_album', album_id = album.id) }}" class="btn btn-info btn-sm">View</a> |
                             <a href="{{ url_for('update_album', album_id = album.id) }}" class="btn btn-primary btn-sm">Update</a> |
                             <a href="{{ url_for('delete_album', album_id = album.id) }}" class="btn btn-danger btn-sm">Delete</a>
                         </td>

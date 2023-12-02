@@ -12,7 +12,7 @@
         Register as a creator to upload your own songs, view summary stats and much more!
       </p>
     </div>
-    <div class="d-grid d-md-block gap-5 mt-5">
+    <div class="d-flex justify-content-center gap-5 mt-5">
       <a href="{{  url_for('home')  }}" class="btn btn-primary me-5 p" type="button">Maybe Later</a>
       <form method="post" action="{{ url_for('register_creator') }}">
         <button type="submit" class="btn btn-success ms-5 p">Yes</button>

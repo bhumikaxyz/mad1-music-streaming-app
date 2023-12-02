@@ -7,15 +7,15 @@
   style="height: 90vh"
 >
   <form
-    method="post"
-    action="{{  url_for('home')  }}"
+    method="POST"
+    action="{{  url_for('create_song')  }}"
     style="margin-top: 2em; margin-bottom: auto; margin-bottom: auto"
     class="form-outline w-50" 
     enctype="multipart/form-data"
   >
     {{ form.hidden_tag() }}
 
-    <h1 class="h3 mb-3 font-weight-normal text-center">Upload a Song</h1>
+    <legend><h1 class="h3 mb-3 font-weight-normal text-center">{{ legend }}</h1></legend>
     <div class="mb-3">
       <p class="lead text-center">
         Cannot find your favorite tune in our library? Upload a song from your
@@ -31,8 +31,16 @@
     </div>
 
     <div class="mb-3">
-      <label for="formFile" class="form-label">Browse</label>
-      <input class="form-control" type="file" accept=".mp3" id="formFile">
+      <label for="formFile" class="form-label">Browse File</label><br>
+      {{ form.file(class='form-control-file', type='file') }}
+      {% if form.file.errors %}
+        {% for errors in form.file.errors %}
+          <span>
+            {{ error }}
+          </span><br>
+        {% endfor %}
+      {% endif %}
+      <!-- <input class="form-control" type="file" accept=".mp3" id="formFile"> -->
     </div>
 
 

@@ -19,24 +19,19 @@
             </div>
             
             <div class="container mb-5 justify-content-between">
-                <button class="btn" data-bs-toggle="button"><i class="bi bi-heart"></i></button>
-
-            <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Rate
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">1</a></li>
-                  <li><a class="dropdown-item" href="#">2</a></li>
-                  <li><a class="dropdown-item" href="#">3</a></li>
-                  <li><a class="dropdown-item" href="#">4</a></li>
-                  <li><a class="dropdown-item" href="#">5</a></li>
-                </ul>
-              </div>
-
-            </div>   
+              <form method="post" action="{{ url_for('rate_song', song_id=song.id) }}">
+                {{ form.hidden_tag() }}
+                
+                  <button>{{ form.like() }}  {{ form.like.label }}</button>
+                
             
-            
+                  <label for="exampleFormControlInput1" class="form-label"
+                  >{{ form.rating.label }}</label> 
+                  {{ form.rating(class="form-control") }}
+                  <div>{{ form.submit(class="btn btn-primary my-3") }}</div> 
+                </form>
+  
+            </div>  
             <div class="container align-items-end mt-2">
                 <audio controls src="{{  url_for('static', filename='audios/' + song.title + '.mp3')  }}" class="embed-responsive-item mt-5 align-items-end justify-content-end" style="width: 450px;"></audio>
             </div>

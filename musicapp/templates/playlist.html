@@ -2,8 +2,10 @@
 
 {% block content %}
 <div class="container pt-4 mb-5 justify-content-between align-items-center">
-    <h2>Your Playlists</h2>
-    <a href="{{  url_for('create_playlist') }}" class="btn btn-success">+ Add Playlist</a>
+        <h2>Your Playlists</h2>
+        <h2 class="text-end">
+        <a href="{{  url_for('create_playlist') }}" class="btn btn-success">+ Add Playlist</a>
+        </h2>   
     <div class="container-sm d-flex">
         {% if playlists | length == 0 %}
             <p class="lead">You have not created any playlist yet.</p>
@@ -23,15 +25,14 @@
                         <td>{{ playlist.id }}</td>
                         <td>{{ playlist.name }}</td>
                         <td>
-                            <a href="" class="btn btn-info btn-sm">View</a> |
+                            <a href="{{ url_for('view_playlist', playlist_id = playlist.id) }}" class="btn btn-info btn-sm">View</a> |
                             <a href="{{ url_for('update_playlist', playlist_id = playlist.id) }}" class="btn btn-primary btn-sm">Update</a> |
                             <a href="{{ url_for('delete_playlist', playlist_id = playlist.id) }}" class="btn btn-danger btn-sm">Delete</a>
                         </td>
                     </tr>
                     {% endfor%}
                 </tbody>
-            </table>    
-           
+            </table>        
         {% endif %}
     </div>   
 </div>    

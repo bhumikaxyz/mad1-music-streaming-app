@@ -1,0 +1,36 @@
+{% extends "layout.html" %} 
+
+{% block content %}
+<div class="container pt-4 mb-5 justify-content-between align-items-center">
+    <h2>Album: {{ album.name }}</h2>
+    <div class="container-sm d-flex">
+        {% if songs | length == 0 %}
+            <p class="lead">This album is empty.</p>
+        {% else %}
+            
+            <table class="table table-bordered text-center">
+                <thead>
+                  <tr>
+                    <th scope="col">S. No.</th>
+                    <th scope="col">Song</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for song in songs %}
+                    <tr>
+                        <td>{{ song.id }}</td>
+                        <td>{{ song.title }}</td>
+                        <td>
+                            <a href="{{ url_for('play_song', song_id=song.id) }}" class="btn btn-info btn-sm">Play</a>
+                        </td>
+                    </tr>
+                    {% endfor%}
+                </tbody>
+            </table>    
+           
+        {% endif %}
+    </div>   
+</div>    
+
+{% endblock content %}

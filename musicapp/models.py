@@ -18,7 +18,7 @@ class User(db.Model, UserMixin):
     is_flagged = db.Column(db.Boolean, default = False)
 
     playlists = db.relationship('Playlist', backref = 'user', lazy = True)
-    interactions = db.relationship('Interactions', backref = 'user', lazy = True)
+    interactions = db.relationship('Interactions', backref = 'user', lazy = 'dynamic')
 
 
     def __repr__(self):
@@ -36,12 +36,12 @@ class Song(db.Model):
     filename = db.Column(db.String(100), unique =True)
     duration = db.Column(db.Time, nullable = True)
     lyrics = db.Column(db.Text)
-    album_id = db.Column(db.Integer, db.ForeignKey('album.id'), nullable = False)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable = False)
+    album_id = db.Column(db.Integer, db.ForeignKey('album.id'))
+    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'))
     timestamp = db.Column(db.DateTime(), server_default=func.now())
 
     
-    interactions = db.relationship('Interactions', backref = 'song', lazy = True)
+    interactions = db.relationship('Interactions', backref = 'song', lazy = 'dynamic')
 
     def __repr__(self):
         return f'{self.title}'
@@ -57,7 +57,7 @@ class Album(db.Model):
     songs = db.relationship('Song', backref = 'album', lazy = True)
     
     def __repr__(self):
-        return f'Album {self.name}'
+        return f'{self.name}'
 
 
 class Artist(db.Model):
@@ -80,7 +80,7 @@ class Playlist(db.Model):
     
 
     def __repr__(self):
-        return f'Playlist {self.name}'
+        return f'{self.name}'
      
 
 class Interactions(db.Model):

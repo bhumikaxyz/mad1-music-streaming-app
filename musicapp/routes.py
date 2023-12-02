@@ -1,8 +1,8 @@
 import os
 from musicapp import app, db
 from flask import render_template, url_for, flash, redirect, request, abort
-from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UpdateProfileForm, SongForm, PlaylistForm, AlbumForm
-from musicapp.models import User, Song, Playlist, Album, Artist, Interactions
+from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UpdateProfileForm, SongForm, PlaylistForm, AlbumForm, RateSongForm
+from musicapp.models import User, Song, Playlist, Album, Artist, Interactions, playlist_song
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, current_user, login_required
 
@@ -105,18 +105,23 @@ def register_creator():
     return render_template('register_creator.html')
 
 
+# ========================================= ADMIN ====================================================
+
 @app.route('/admin_dashboard')
+@login_required
 def admin_dashboard():
     return render_template('admin_dashboard.html')
 
 
-@app.route('/admin_options')
+@app.route('/admin_options', methods=['GET', 'POST'])
 def admin_options():
-    return render_template('admin_options.html')
+    songs = Song.query.all()
+    creators = User.query.filter_by(is_creator=True).all()
+    return render_template('admin_options.html', songs=songs, creators=creators)
 
 
 
-# ================================= Playlist CRUD ========================================
+# ================================= CRUD on Playlists ========================================
 
 @app.route('/playlist')
 def playlist():
@@ -141,6 +146,14 @@ def create_playlist():
         flash('Your playlist has been created', 'success')
         return redirect(url_for('playlist'))
     return render_template('create_playlist.html', form=form, songs=songs, legend='Create a Playlist')
+
+
+@app.route('/playlist/view/<int:playlist_id>', methods=['GET', 'POST'])
+@login_required
+def view_playlist(playlist_id):
+    playlist = Playlist.query.get_or_404(playlist_id)
+    songs = playlist.songs
+    return render_template('view_playlist.html', playlist=playlist, songs=songs)
 
 
 @app.route('/playlist/update/<int:playlist_id>', methods=['GET', 'POST'])
@@ -178,13 +191,21 @@ def delete_playlist(playlist_id):
     return redirect(url_for('playlist'))
 
 
-#======================================== Albums CRUD ============================================
+#======================================== CRUD on Albums ============================================
 
 @app.route('/creator_dashboard')
 @login_required
 def creator_dashboard():
     albums = Album.query.all()
-    return render_template('creator_dashboard.html', albums = albums)
+    return render_template('creator_dashboard.html', albums=albums)
+
+
+@app.route('/album/view/<int:album_id>', methods=['GET', 'POST'])
+@login_required
+def view_album(album_id):
+    album = Album.query.get_or_404(album_id)
+    songs = album.songs
+    return render_template('view_album.html', album=album, songs=songs)
 
 
 @app.route('/album/update/<int:album_id>', methods=['GET', 'POST'])
@@ -224,42 +245,44 @@ def delete_album(album_id):
     
 
 
-#====================================== Song CRUD ===================================================
+#====================================== CRUD on Songs ===================================================
 
 
-@app.route('/play/<int:song_id>')
+@app.route('/play/<int:song_id>', methods=['GET', 'POST'])
 def play_song(song_id):
     song = Song.query.get_or_404(song_id)
+    form = RateSongForm()
+
     try:
         lyrics = f"D:\Study Resources\IITM OD\mad1_project\musicapp\static\lyrics\{song.title}.txt"
         with open(lyrics, 'r') as file:
             file_content = file.read()
     except:
-        file_content = 'Lyrics not available.'        
-    return render_template('play_song.html', song=song, file_content=file_content)
+        file_content = 'Lyrics not available.'      
+    return render_template('play_song.html', song=song, file_content=file_content, form=form)
 
 
 @app.route('/create_song', methods=['GET', 'POST'])
 def create_song():
     form = SongForm()
-    if request.method == 'POST':
+    if request.method=='POST':
         file = request.files['file']
-        if file:
-            filename = file.filename
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            app.logger.info(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            song = Song(file=filename)
-            song.title = form.title.data
-            song.lyrics = form.lyrics.data
-            song.duration = form.duration.data
-            db.session.add(song)
-            db.session.commit()
+        app.logger.debug('file found')
+        filename = file.filename
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        app.logger.info(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        song = Song(filename=filename)
+        song.title = form.title.data
+        song.lyrics = form.lyrics.data
+        song.duration = form.duration.data
+        db.session.add(song)
+        db.session.commit()
 
         flash(f'{form.title.data} has been uploaded successfully', 'success')
         return redirect(url_for('home'))
 
     
-    return render_template('create_song.html', form=form)
+    return render_template('create_song.html', form=form, legend='Upload a Song')
 
 
 @app.route('/song/update/<int:song_id>', methods=['GET', 'POST'])
@@ -275,18 +298,39 @@ def update_song(song_id):
         flash('Song has been updated', 'success')
         return redirect(url_for('home'))
         
-    return render_template('create_playlist.html', form=form)
+    return render_template('create_song.html', form=form, legend='Update Song')
 
 @app.route('/song/delete/<int:song_id>', methods=['GET', 'POST'])
 @login_required
 def delete_song(song_id):
     song = Song.query.get_or_404(song_id)
-
-    if song:
-        for playlist in song.playlists:
-            playlist.songs.remove(song)
-        
-        db.session.delete(song)
-        db.session.commit()
+    db.session.execute(playlist_song.delete().where(playlist_song.c.song_id == song_id))
+    db.session.delete(song)
+    db.session.commit()
     flash('Song has been deleted', 'success')
     return redirect(url_for('home'))
+
+
+# ===================================== Song INTERACTIONS ============================================
+
+
+@app.route('/rate/<int:song_id>', methods=['GET', 'POST'])
+def rate_song(song_id):
+    song = Song.query.get_or_404(song_id)
+    user = current_user
+    form = RateSongForm()
+    if request.method=='POST' and form.validate_on_submit():
+        rating = form.rating.data
+        like = form.like.data
+        existing_interaction = Interactions.query.filter_by(user_id=user.id, song_id=song.id).first()
+        if existing_interaction:
+            existing_interaction.rating = rating
+            existing_interaction.liked = like
+        else:
+            new_interaction = Interactions(user_id=user.id, song_id=song.id, rating=rating, liked=like)
+            db.session.add(new_interaction)
+        
+        db.session.commit()
+
+    return redirect(url_for('play_song', song=song, form=form, song_id=song.id))
+
