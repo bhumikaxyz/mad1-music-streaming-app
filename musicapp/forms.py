@@ -44,7 +44,7 @@ class UpdateProfileForm(FlaskForm):
         if username.data != current_user.username:
             user = User.query.filter_by(username=username.data).first()
             if user:
-                raise ValidationError('This username is taken. Kindly choose a different one.')
+                raise ValidationError('This username is taken. Please choose a different one.')
 
 
 class PlaylistForm(FlaskForm):
@@ -56,19 +56,26 @@ class PlaylistForm(FlaskForm):
 class AlbumForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(max=100)])
     genre = SelectField('Genre', choices=['Pop', 'Rock', 'Metal', 'Classical', 'Other'], validators=[DataRequired()])
+    artist = StringField('Artist')
     songs = SelectMultipleField('Songs', coerce=int, validators=[DataRequired()], widget=widgets.ListWidget(prefix_label=False), option_widget=widgets.CheckboxInput())
     submit = SubmitField('Add Songs') 
 
 class SongForm(FlaskForm):
     title = StringField('Song Title', validators=[DataRequired()])
     file = FileField('File', validators=[FileAllowed(['mp3'])])
+    artist = StringField('Artist')
     duration = TimeField('Duration')
     lyrics = TextAreaField('Lyrics')
     submit = SubmitField('Upload')
 
 
 class RateSongForm(FlaskForm):
-    rating = SelectField('Rate', choices=[1, 2, 3, 4, 5], validators=[DataRequired()])
+    rating = SelectField('Rate', choices=[0, 1, 2, 3, 4, 5], validators=[DataRequired()])
     like = BooleanField('Like')
     submit = SubmitField('Submit')
     
+
+class FilterForm(FlaskForm):
+    filter_type = SelectField('Filters', choices=[('title', 'Title'), ('artist', 'Artist'), ('rating', 'Rating')])
+    filter_value = StringField('', validators=[DataRequired()])
+    submit = SubmitField('Search')

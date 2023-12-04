@@ -1,7 +1,8 @@
 import os
 from musicapp import app, db
 from flask import render_template, url_for, flash, redirect, request, abort
-from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UpdateProfileForm, SongForm, PlaylistForm, AlbumForm, RateSongForm
+from sqlalchemy import func
+from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UpdateProfileForm, SongForm, PlaylistForm, AlbumForm, RateSongForm, FilterForm
 from musicapp.models import User, Song, Playlist, Album, Artist, Interactions, playlist_song
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, current_user, login_required
@@ -19,6 +20,9 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
+        if user.is_flagged:
+            flash('You are disallowed from using this platform', 'danger')
+            return redirect(url_for('index'))
         if user and check_password_hash(user.password_hash, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
@@ -64,10 +68,40 @@ def admin_login():
     return render_template('admin_login.html', title='AdminLogin', form=form)
 
 
-@app.route('/home', methods=['GET', 'POST'])
+# ========================================== USER ====================================================
+
+@app.route('/home', methods=['GET'])
 @login_required
 def home():
-    return render_template('home.html', songs=Song.query.all())
+    form = FilterForm()
+    q = Song.query.filter_by(is_flagged=False)
+    app.logger.debug("Form", form.validate_on_submit())
+    app.logger.debug("form errors", form.errors)
+    filter_type = request.args.get('filter_type', '')
+
+
+    # if form.validate_on_submit():
+    filter_type = form.filter_type.data
+    filter_value = form.filter_value.data
+    app.logger.debug(f"Filter Type: {filter_type}, Filter Value: {filter_value}")
+
+    if filter_value:
+        if filter_type=='artist':
+            q = q.filter(Song.artist.ilike(f"%{filter_value}%"))
+        elif filter_type=='title':
+            app.logger.debug('hiiii')
+            q = q.filter(Song.title.ilike(f"%{filter_value}%"))     
+        elif filter_type=='rating':
+            try:
+                rating = float(filter_value)
+                q = q.join(Interactions).group_by(Song.id).having(db.func.avg(Interactions.rating)==rating)
+            except:
+                flash('Invalid rating value. Please enter a numeric value.', 'danger')    
+
+
+    app.logger.debug(f'filtered songs{q.all()}')
+    return render_template('home.html', songs=q.all(), form=form)
+
 
 @app.route('/profile', methods = ['GET', 'POST'])
 @login_required
@@ -91,7 +125,8 @@ def profile():
             flash('Incorrect password', 'danger')
             return redirect(url_for('profile'))
         
-    return render_template('profile.html', form=form)    
+    return render_template('profile.html', form=form)  
+
 
 @app.route('/register_creator', methods = ['GET', 'POST'])
 def register_creator():
@@ -104,21 +139,62 @@ def register_creator():
         
     return render_template('register_creator.html')
 
-
 # ========================================= ADMIN ====================================================
 
-@app.route('/admin_dashboard')
-@login_required
+@app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
-    return render_template('admin_dashboard.html')
-
-
-@app.route('/admin_options', methods=['GET', 'POST'])
-def admin_options():
     songs = Song.query.all()
     creators = User.query.filter_by(is_creator=True).all()
-    return render_template('admin_options.html', songs=songs, creators=creators)
 
+    n_users = User.query.filter(User.is_creator==False).count()
+    n_creators = User.query.filter(User.is_creator==True).count()
+    n_songs = Song.query.count()
+    n_albums = Album.query.count()
+    n_artists = Artist.query.count()
+    avg_rating = db.session.query(func.avg(Interactions.rating)).scalar()
+
+
+    return render_template('admin_dashboard.html', songs=songs, creators=creators,
+                           n_users=n_users, n_creators=n_creators, n_songs=n_songs,
+                           n_albums=n_albums, n_artists=n_artists, avg_rating=avg_rating)
+
+@app.route('/blacklist_song/<int:song_id>', methods=['GET', 'POST'])
+def blacklist_song(song_id):
+    song = Song.query.get_or_404(song_id)
+    if request.method=='POST':
+        if song:
+            song.is_flagged = True
+            db.session.commit()
+    return redirect(url_for('admin_options'))  
+
+
+@app.route('/whitelist_song/<int:song_id>', methods=['GET', 'POST'])
+def whitelist_song(song_id):
+    song = Song.query.get_or_404(song_id)
+    if request.method=='POST':
+        if song:
+            song.is_flagged = False
+            db.session.commit()
+    return redirect(url_for('admin_options'))  
+
+
+@app.route('/blacklist_creator/<int:creator_id>', methods=['GET', 'POST'])
+def blacklist_creator(creator_id):
+    creator = User.query.get_or_404(creator_id)
+    if request.method=='POST':
+        if creator:
+            creator.is_flagged = True
+            db.session.commit()
+    return redirect(url_for('admin_options'))
+
+@app.route('/whitelist_creator/<int:creator_id>', methods=['GET', 'POST'])
+def whitelist_creator(creator_id):
+    creator = User.query.get_or_404(creator_id)
+    if request.method=='POST':
+        if creator:
+            creator.is_flagged = False
+            db.session.commit()
+    return redirect(url_for('admin_options'))
 
 
 # ================================= CRUD on Playlists ========================================
@@ -133,7 +209,7 @@ def playlist():
 @login_required
 def create_playlist():
     form = PlaylistForm()
-    songs = Song.query.all()
+    songs = Song.query.filter_by(is_flagged=False).all()
     form.songs.choices = [(song.id, song.title) for song in songs]
     
     if request.method == 'POST' and form.validate_on_submit():
@@ -152,7 +228,12 @@ def create_playlist():
 @login_required
 def view_playlist(playlist_id):
     playlist = Playlist.query.get_or_404(playlist_id)
-    songs = playlist.songs
+    songs = (
+        db.session.query(Song)
+        .join(playlist_song)
+        .filter(Playlist.id == playlist_id, Song.is_flagged.is_(False))
+        .all()
+    )
     return render_template('view_playlist.html', playlist=playlist, songs=songs)
 
 
@@ -162,7 +243,7 @@ def update_playlist(playlist_id):
     playlist = Playlist.query.get_or_404(playlist_id)
     form = PlaylistForm()
     form.name.data = playlist.name
-    songs = Song.query.all()
+    songs = Song.query.filter_by(is_flagged=False).all()
     form.songs.choices = [(song.id, song.title) for song in songs]
 
 
@@ -200,6 +281,33 @@ def creator_dashboard():
     return render_template('creator_dashboard.html', albums=albums)
 
 
+@app.route('/album/create', methods=['GET', 'POST'])
+@login_required
+def create_album():
+    form = AlbumForm()
+    songs = Song.query.filter_by(is_flagged=False).all()
+    form.songs.choices = [(song.id, song.title) for song in songs]
+    if request.method == 'POST' and form.validate_on_submit():
+        album = Album(name=form.name.data)
+        album.user_id = current_user.id
+        artist = Artist.query.filter(Artist.name==form.artist.data).first()
+        if not artist:
+            artist = Artist(name=form.artist.data)
+            db.session.add(artist)
+            db.session.commit()
+
+        album.artist_id=artist.id
+        album.genre = form.genre.data
+        selected_songs = form.songs.data
+        query_songs = Song.query.filter(Song.id.in_(selected_songs))
+        album.songs = list(query_songs)
+        db.session.add(album)
+        db.session.commit()
+        return redirect(url_for('creator_dashboard'))
+
+    return render_template('create_album.html', form=form, songs=songs, legend='Create an Album')
+
+
 @app.route('/album/view/<int:album_id>', methods=['GET', 'POST'])
 @login_required
 def view_album(album_id):
@@ -215,7 +323,8 @@ def update_album(album_id):
     form = AlbumForm()
     form.name.data = album.name
     form.genre.data = album.genre
-    songs = album.songs
+    songs = Song.query.filter_by(is_flagged=False).all()
+    existing_songs=[song.id for song in album.songs]
 
     form.songs.choices = [(song.id, song.title) for song in songs]
     
@@ -227,7 +336,7 @@ def update_album(album_id):
         flash('Your playlist has been created', 'success')
         return redirect(url_for('creator_dashboard'))
         
-    return render_template('update_album.html', form=form, songs=songs, album=album, legend='Update Album')
+    return render_template('update_album.html', form=form, songs=songs, existing_songs=existing_songs, album=album, legend='Update Album')
 
 
 @app.route('/album/delete/<int:album_id>', methods=['GET', 'POST'])
@@ -270,9 +379,17 @@ def create_song():
         app.logger.debug('file found')
         filename = file.filename
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        app.logger.info(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        artist = Artist.query.filter(Artist.name==form.artist.data).first()
+        if not artist:
+            artist = Artist(name=form.artist.data)
+            db.session.add(artist)
+            db.session.commit()
+
         song = Song(filename=filename)
+        song.user_id = current_user.id
         song.title = form.title.data
+        song.artist_id = artist.id
         song.lyrics = form.lyrics.data
         song.duration = form.duration.data
         db.session.add(song)

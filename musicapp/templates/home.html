@@ -9,18 +9,55 @@
         <a href="{{  url_for('create_song') }}" class="btn btn-success">+ Add Song</a>
       {% endif %}
 
-      <div class="dropdown">
-      <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">Filter</button>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#">Artist</a></li>
-          <li><a class="dropdown-item" href="#">Rating</a></li>
-          <li><a class="dropdown-item" href="#">Genre</a></li>
-        </ul>
-    </div>
-    
-    </div>
-    
+    <form method="get" action="{{ url_for('home') }}">
+      {{ form.hidden_tag() }}
+      {{ form.filter_type.label }}
+      {{ form.filter_type }}
+      {{ form.filter_value.label }}
+      {{ form.filter_value }}
 
+      <div>{{ form.submit(class="btn btn-primary my-3") }}</div> 
+    </form>
+    </div>
+    
+    {% if filter_type %}
+      {% if songs %}
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
+        {% for song in songs %}
+        <div class="col">
+          <div class="card shadow-sm bg-primary-subtle">
+            <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-1 shadow-sm mx-auto" alt="song" width="200 px" height="200 px";>
+            <div class="card-body">
+              <p class="card-text">
+                <p class="mb-0">{{ song.title }}</p>
+                <p><small>{{ song.artist }}</small></p>
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <a type="button" class="btn btn-sm btn-outline-secondary" href="{{  url_for('play_song', song_id=song.id)  }}">
+                    Play
+                  </a>
+                  {% if current_user.is_creator %}
+                    <a type="button" class="btn btn-sm btn-outline-secondary" href="{{  url_for('update_song', song_id=song.id)  }}">
+                      Edit
+                    </a>
+                    <a type="button" class="btn btn-sm btn-outline-secondary" href="{{  url_for('delete_song', song_id=song.id)  }}">
+                      Delete
+                    </a>
+  
+                  {% endif %}
+                </div>
+                <small class="text-body-secondary">{{ song.duration }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+
+      {% endif %}
+    {% else %} 
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
       {% for song in songs %}
       <div class="col">
@@ -52,105 +89,8 @@
         </div>
       </div>
       {% endfor %}
-      <!-- <div class="col">
-        <div class="card shadow-sm bg-primary-subtle">
-          <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-1 shadow-sm mx-auto" alt="song" width="200 px" height="200 px";>
-          <div class="card-body">
-            <p class="card-text">
-              <p class="mb-0">Song Name</p>
-              <p><small>Artist Name</small></p>
-            </p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-outline-secondary">
-                  Play
-                </button>
-              </div>
-              <small class="text-body-secondary">9 mins</small>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col">
-        <div class="card shadow-sm bg-primary-subtle">
-          <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-1 shadow-sm mx-auto" alt="song" width="200 px" height="200 px";>
-          <div class="card-body">
-            <p class="card-text">
-              <p class="mb-0">Song Name</p>
-              <p><small>Artist Name</small></p>
-            </p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-outline-secondary">
-                  Play
-                </button>
-              </div>
-              <small class="text-body-secondary">9 mins</small>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col">
-        <div class="card shadow-sm bg-primary-subtle">
-          <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-1 shadow-sm mx-auto" alt="song" width="200 px" height="200 px";>
-          <div class="card-body">
-            <p class="card-text">
-              <p class="mb-0">Song Name</p>
-              <p><small>Artist Name</small></p>
-            </p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-outline-secondary">
-                  Play
-                </button>
-              </div>
-              <small class="text-body-secondary">9 mins</small>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col">
-        <div class="card shadow-sm bg-primary-subtle">
-          <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-1 shadow-sm mx-auto" alt="song" width="200 px" height="200 px";>
-          <div class="card-body">
-            <p class="card-text">
-              <p class="mb-0">Song Name</p>
-              <p><small>Artist Name</small></p>
-            </p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-outline-secondary">
-                  Play
-                </button>
-              </div>
-              <small class="text-body-secondary">9 mins</small>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col">
-        <div class="card shadow-sm bg-primary-subtle">
-          <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-1 shadow-sm mx-auto" alt="song" width="200 px" height="200 px";>
-          <div class="card-body">
-            <p class="card-text">
-              <p class="mb-0">Song Name</p>
-              <p><small>Artist Name</small></p>
-            </p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-outline-secondary">
-                  Play
-                </button>
-              </div>
-              <small class="text-body-secondary">9 mins</small>
-            </div>
-          </div>
-        </div>
-      </div> -->
     </div>
-  
+    {% endif %} 
+  </div>
+</div>  
 {% endblock content %}

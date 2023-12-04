@@ -28,6 +28,15 @@
     </div>
 
     <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label"
+          >{{ form.artist.label }}</label
+        >
+        {% if form.artist.errors %} {{ form.artist(class="form-control") }}
+        <div class="text-danger">{{ form.artist.errors[0] }}</div>
+        {% else %} {{ form.artist(class="form-control") }} {% endif %}
+      </div>
+
+    <div class="mb-3">
       <label for="exampleFormControlInput1" class="form-label"
         >{{ form.genre.label }}</label
       >
@@ -39,8 +48,7 @@
     </div>
 
     <div class="form-group">
-      {{ form.songs.label(class="form-control-label") }} {% for choice in
-      form.songs %}
+      {{ form.songs.label(class="form-control-label") }} {% for choice in form.songs %}
       <div class="form-check">
         <input
           type="checkbox"
@@ -48,9 +56,6 @@
           name="{{ form.songs.name }}"
           value="{{ choice.data }}"
           class="form-check-input"
-          {% if choice.data in existing_songs %}
-            checked
-          {% endif %}
         />
         <label for="{{ choice.id }}" class="form-check-label"
           >{{ choice.label.text }}</label

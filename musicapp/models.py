@@ -17,7 +17,9 @@ class User(db.Model, UserMixin):
     is_creator = db.Column(db.Boolean, default = False)
     is_flagged = db.Column(db.Boolean, default = False)
 
+    song = db.relationship('Song', backref='user', lazy=True)
     playlists = db.relationship('Playlist', backref = 'user', lazy = True)
+    albums = db.relationship('Album', backref='user', lazy=True)
     interactions = db.relationship('Interactions', backref = 'user', lazy = 'dynamic')
 
 
@@ -38,9 +40,11 @@ class Song(db.Model):
     lyrics = db.Column(db.Text)
     album_id = db.Column(db.Integer, db.ForeignKey('album.id'))
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     timestamp = db.Column(db.DateTime(), server_default=func.now())
+    is_flagged = db.Column(db.Boolean, default = False)
 
-    
+
     interactions = db.relationship('Interactions', backref = 'song', lazy = 'dynamic')
 
     def __repr__(self):
@@ -49,9 +53,10 @@ class Song(db.Model):
 
 class Album(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(50), unique = True, nullable = False)
+    name = db.Column(db.String(50), nullable = False)
     genre = db.Column(db.String(100), nullable = True, default = 'Other')
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable = False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     timestamp = db.Column(db.DateTime, server_default=func.now())
 
     songs = db.relationship('Song', backref = 'album', lazy = True)

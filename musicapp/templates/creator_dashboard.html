@@ -38,6 +38,7 @@
   </div>
 
   <h2>Your albums</h2>
+  <a href="{{  url_for('create_album') }}" class="btn btn-success">+ Add Album</a>
     <div class="container-sm d-flex">
         {% if albums | length == 0 %}
             <p class="lead">No records found.</p>

@@ -1,22 +1,133 @@
-{% extends "layout.html" %} \
+{% extends "layout.html" %} {% block content %}
 
-{% block content %}
-    <div class="container py-4">
-        <h2>Admin Dashboard</h2>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
-            
+<div
+  class="container-md py-3"
+>
+  <div class="row justify-content-between">
+    <div class="col-8">
+      <h2 class="h2 mb-4">Admin Dashboard</h2>
 
-            <div class="card border-primary mb-3" style="max-width: 18rem;">
-                <!-- <div class="card-header">Header</div> -->
-                <div class="card-body">
-                  <h5 class="card-title">Primary card title</h5>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                  <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
-              </div>
+      <div class="container w-100 mb-5 rounded">
+        <h4 class="text-muted">All Tracks</h4>
 
+        {% if songs | length == 0 %}
+        <p class="lead">No records found.</p>
+        {% else %}
+        <table class="table table-bordered text-center">
+          <thead>
+            <tr>
+              <th scope="col">S. No.</th>
+              <th scope="col">Songs</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for song in songs %}
+            <tr>
+              <td>{{ song.id }}</td>
+              <td>{{ song.title }}</td>
+              <td class="d-flex justify-content-center">
+                <a
+                  href="{{ url_for('play_song', song_id=song.id) }}"
+                  class="btn btn-outline-info btn-sm mx-3"
+                  >Details</a
+                >
+                <form
+                  method="POST"
+                  action="{{ url_for('blacklist_song', song_id=song.id) }}"
+                >
+                  <button type="submit" class="btn btn-outline-danger btn-sm mx-3">
+                    Blacklist
+                  </button>
+                </form>
 
-        </div>
+                <form
+                  method="POST"
+                  action="{{ url_for('whitelist_song', song_id=song.id) }}"
+                >
+                  <button class="btn btn-outline-secondary btn-sm mx-3">Whitelist</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor%}
+          </tbody>
+        </table>
+        {% endif %}
+      </div>
+
+      <div class="container w-100 mb-3 rounded">
+        <h4 class="text-muted">All Creators</h4>
+        {% if creators | length == 0 %}
+        <p class="lead">No records found.</p>
+        {% else %}
+        <table class="table table-bordered text-center">
+          <thead>
+            <tr>
+              <th scope="col">S. No.</th>
+              <th scope="col">Creator</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for creator in creators %}
+            <tr>
+              <td>{{ creator.id }}</td>
+              <td>{{ creator.name }}</td>
+              <td class="d-flex justify-content-center">
+                <form
+                  method="POST"
+                  action="{{ url_for('blacklist_creator', creator_id=creator.id) }}"
+                >
+                  <button type="submit" class="btn btn-outline-danger btn-sm mx-3">
+                    Blacklist
+                  </button>
+                </form>
+
+                <form
+                  method="POST"
+                  action="{{ url_for('whitelist_creator', creator_id=creator.id) }}"
+                >
+                  <button class="btn btn-outline-secondary btn-sm mx-3">Whitelist</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor%}
+          </tbody>
+        </table>
+        {% endif %}
+      </div>
     </div>
-
+    <div class="col-3 mt-5 py-3">
+        <h4 class="text-muted text-center">Summary Bulletin</h4>
+        <table class="table table-primary table-borderless">
+            <tbody>
+                <tr>
+                    <td>Number of Users</td>
+                    <td>{{ n_users }}</td>
+                </tr>
+                <tr>
+                    <td>Number of Creators</td>
+                    <td>{{ n_creators }}</td>
+                </tr>
+                <tr>
+                    <td>Number of Albums</td>
+                    <td>{{ n_albums }}</td>
+                </tr>
+                <tr>
+                    <td>Number of Artists</td>
+                    <td>{{ n_artists }}</td>
+                </tr>
+                <tr>
+                    <td>Number of Songs</td>
+                    <td>{{ n_songs }}</td>
+                </tr>
+                <tr>
+                    <td>Average Song Ratings</td>
+                    <td>{{ avg_rating }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>   
+  </div>
+</div>
 {% endblock content %}
