@@ -8,7 +8,7 @@
 >
   <form
     method="POST"
-    action="{{  url_for('create_song')  }}"
+    action="{{  url_for('update_song', song_id = song.id)  }}"
     style="margin-top: 2em; margin-bottom: auto; margin-bottom: auto"
     class="form-outline w-50" 
     enctype="multipart/form-data"
@@ -17,10 +17,10 @@
 
     <legend><h2 class="h2 mb-3 font-weight-normal text-center">{{ legend }}</h2></legend>
     <div class="mb-3">
-      <p class="lead text-center">
+      <!-- <p class="lead text-center">
         Cannot find your favorite tune in our library? Upload a song from your
         device and start listening to it today!
-      </p>
+      </p> -->
     </div>
 
     <div class="mb-3">
@@ -28,19 +28,6 @@
       {% if form.title.errors %} {{ form.title(class="form-control") }}
       <div class="text-danger">{{ form.title.errors[0] }}</div>
       {% else %} {{ form.title(class="form-control") }} {% endif %}
-    </div>
-
-    <div class="mb-3">
-      <label for="formFile" class="form-label">Browse File</label><br>
-      {{ form.file(class='form-control-file', type='file') }}
-      {% if form.file.errors %}
-        {% for errors in form.file.errors %}
-          <span>
-            {{ error }}
-          </span><br>
-        {% endfor %}
-      {% endif %}
-      <!-- <input class="form-control" type="file" accept=".mp3" id="formFile"> -->
     </div>
 
     <div class="mb-3">

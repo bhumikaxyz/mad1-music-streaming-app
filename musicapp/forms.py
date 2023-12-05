@@ -64,7 +64,7 @@ class SongForm(FlaskForm):
     title = StringField('Song Title', validators=[DataRequired()])
     file = FileField('File', validators=[FileAllowed(['mp3'])])
     artist = StringField('Artist')
-    duration = TimeField('Duration')
+    # duration = TimeField('Duration')
     lyrics = TextAreaField('Lyrics')
     submit = SubmitField('Upload')
 
@@ -72,7 +72,7 @@ class SongForm(FlaskForm):
 class RateSongForm(FlaskForm):
     rating = SelectField('Rate', choices=[0, 1, 2, 3, 4, 5], validators=[DataRequired()])
     like = BooleanField('Like')
-    submit = SubmitField('Submit')
+    submit = SubmitField('Rate')
     
 
 class FilterForm(FlaskForm):

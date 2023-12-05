@@ -2,43 +2,42 @@
 
 <div class="container pt-4 mb-5 justify-content-between align-items-center">
   <h2>Creator Dashboard</h2>
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-3 mt-2">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-3 mt-2 mb-5">
     <div
-      class="card border-primary mx-4"
-      style="max-width: 20rem; height: 10rem"
+      class="card border-primary mx-4 text-center text-primary"
+      style="max-width: 20rem; height: 10rem;"
     >
       <div class="card-body">
         <h5 class="card-title">Total Songs Uploaded</h5>
-        <p class="card-text">
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
+        <p class="card-text display-3">
+          {{ n_songs }}
         </p>
       </div>
     </div>
 
-    <div class="card border-primary mx-4" style="max-width: 20rem">
+    <div class="card border-primary mx-4 text-center text-primary" style="max-width: 20rem; height: 10rem;">
       <div class="card-body">
         <h5 class="card-title">Average Rating of Songs</h5>
-        <p class="card-text">
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
+        <p class="card-text display-3">
+          {{ avg_rating}}
         </p>
       </div>
     </div>
 
-    <div class="card border-primary mx-4" style="max-width: 20rem">
+    <div class="card border-primary mx-4 text-center text-primary" style="max-width: 20rem; height: 10rem;">
       <div class="card-body">
         <h5 class="card-title">Total Albums Created</h5>
-        <p class="card-text">
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
+        <p class="card-text display-3">
+          {{ n_albums }}
         </p>
       </div>
     </div>
   </div>
 
-  <h2>Your albums</h2>
-  <a href="{{  url_for('create_album') }}" class="btn btn-success">+ Add Album</a>
+  <h3>Your Albums</h3>
+  <h2 class="text-end">
+    <a href="{{  url_for('create_album') }}" class="btn btn-success">+ Add Album</a>
+  </h2>
     <div class="container-sm d-flex">
         {% if albums | length == 0 %}
             <p class="lead">No records found.</p>
@@ -57,9 +56,9 @@
                         <td>{{ album.id }}</td>
                         <td>{{ album.name }}</td>
                         <td>
-                            <a href="{{ url_for('view_album', album_id = album.id) }}" class="btn btn-info btn-sm">View</a> |
-                            <a href="{{ url_for('update_album', album_id = album.id) }}" class="btn btn-primary btn-sm">Update</a> |
-                            <a href="{{ url_for('delete_album', album_id = album.id) }}" class="btn btn-danger btn-sm">Delete</a>
+                            <a href="{{ url_for('view_album', album_id = album.id) }}" class="btn btn-outline-info btn-sm mx-3">View</a> 
+                            <a href="{{ url_for('update_album', album_id = album.id) }}" class="btn btn-outline-primary btn-sm mx-3">Update</a> 
+                            <a href="{{ url_for('delete_album', album_id = album.id) }}" class="btn btn-outline-danger btn-sm mx-3">Delete</a>
                         </td>
                     </tr>
                     {% endfor%}

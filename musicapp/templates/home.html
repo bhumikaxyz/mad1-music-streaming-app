@@ -1,23 +1,46 @@
 {% extends "layout.html" %} {% block content %}
 
 <div class="container py-4">
-  <div class="container">
-    <div class="container d-flex justify-content-between align-items-center">
-      <h2>All Tracks</h2>
+    <h2>All Tracks</h2>
+      <div class="container d-flex justify-content-between align-items-center mb-3">
 
-      {% if current_user.is_creator %}
-        <a href="{{  url_for('create_song') }}" class="btn btn-success">+ Add Song</a>
-      {% endif %}
-
-    <form method="get" action="{{ url_for('home') }}">
-      {{ form.hidden_tag() }}
-      {{ form.filter_type.label }}
-      {{ form.filter_type }}
-      {{ form.filter_value.label }}
-      {{ form.filter_value }}
-
-      <div>{{ form.submit(class="btn btn-primary my-3") }}</div> 
+    <form method="get" action="{{ url_for('home') }}" class="d-flex">
+    
+      <div class="form-group mb-0 me-2">
+        {{ form.filter_type.label }}
+        {{ form.filter_type }}
+      </div>
+      <div class="form-group mb-0 me-2">
+        {{ form.filter_value.label }}
+        {{ form.filter_value }}
+      </div>
+      <div class="form-group mb-0 me-2">
+        <div>{{ form.submit(class="btn btn-outline-primary btn-sm") }}</div> 
+      </div>
     </form>
+
+
+    <!-- <form method="get" action="{{ url_for('home') }}" class="d-flex">
+
+     <label for="filter_type">Filter by:</label>
+      <select name="filter_type" id="filter_type">
+        <option value="">Select Filter</option>
+        <option value="title">Title</option>
+        <option value="rating">Rating</option>
+        <option value="artist">Artist</option>
+      </select>
+      <input type="text" name="filter_value" placeholder="Enter value for filter">
+      <button type="submit">Filter</button>
+      <form action="{{ url_for('home') }}" method="get">
+        <button type="submit" class="clear-filters-btn">Clear Filter</button> 
+      </form>   
+    </form>     -->
+
+    {% if current_user.is_creator %}
+      <h2 class="text-end">
+        <a href="{{  url_for('create_song') }}" class="btn btn-success btn-sm">+ Add Song</a>
+      </h2>  
+      {% endif %}
     </div>
     
     {% if filter_type %}
@@ -25,15 +48,15 @@
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
         {% for song in songs %}
         <div class="col">
-          <div class="card shadow-sm bg-primary-subtle">
+          <div class="card shadow-sm bg-danger-subtle">
             <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-1 shadow-sm mx-auto" alt="song" width="200 px" height="200 px";>
-            <div class="card-body">
+            <div class="card-body padding-top-0">
               <p class="card-text">
                 <p class="mb-0">{{ song.title }}</p>
                 <p><small>{{ song.artist }}</small></p>
               </p>
               <div class="d-flex justify-content-between align-items-center">
-                <div class="btn-group">
+                <div class="btn-group btn-sm">
                   <a type="button" class="btn btn-sm btn-outline-secondary" href="{{  url_for('play_song', song_id=song.id)  }}">
                     Play
                   </a>
@@ -61,9 +84,9 @@
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
       {% for song in songs %}
       <div class="col">
-        <div class="card shadow-sm bg-primary-subtle">
-          <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-1 shadow-sm mx-auto" alt="song" width="200 px" height="200 px";>
-          <div class="card-body">
+        <div class="card shadow-sm bg-danger-subtle">
+          <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-0 shadow-sm mx-auto" alt="song" width="200 px" height="200 px";>
+          <div class="card-body padding-top-0">
             <p class="card-text">
               <p class="mb-0">{{ song.title }}</p>
               <p><small>{{ song.artist }}</small></p>
@@ -90,7 +113,6 @@
       </div>
       {% endfor %}
     </div>
-    {% endif %} 
-  </div>
+    {% endif %}
 </div>  
 {% endblock content %}

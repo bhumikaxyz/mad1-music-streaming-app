@@ -42,7 +42,10 @@
           id="{{ choice.id }}"
           name="{{ form.songs.name }}"
           value="{{ choice.data }}"
-          class="form-check-input"
+          class="form-check-input" 
+          {% if choice.data in existing_songs %}
+            checked
+          {% endif %}
         />
         <label for="{{ choice.id }}" class="form-check-label"
           >{{ choice.label.text }}</label

@@ -1,41 +1,49 @@
-{% extends "layout.html" %} 
-    {% block content %}
+{% extends "layout.html" %} {% block content %}
 
-    <div class="container-sm d-flex mt-5 p-2 gap-5" style="height: 90vh;">
-        <div class="container w-50 h-100 p-3 bg-danger-subtle shadow opacity-90 overflow-auto">
-            <h1 class="display-6 mb-4">Lyrics</h1>
-            <pre>{{ file_content }}</pre> 
+<div class="container-sm d-flex mt-5 p-2 gap-5" style="height: 90vh">
+  <div class="col-6 p-3 bg-danger-subtle shadow opacity-90 overflow-auto">
+    <h1 class="display-6 mb-4">Lyrics</h1>
+    <pre>{{ lyrics }}</pre>
+  </div>
+  <div class="container d-block w-50 h-100 p-3 justify-content-center">
+    <div
+      class="container d-flex flex-column align-items-center justify-content-center"
+    >
+      <img src="{{ url_for('static', filename='/song.png') }}"
+      class="img-thumbnail rounded mb-3 shadow" alt="..." width="200 px"
+      height="200 px";">
+    </div>
+
+    <div class="container mb-4">
+      <h3>{{ song.title }}</h3>
+      <h3><small class="text-body-secondary">{{ song.artist }}</small></h3>
+    </div>
+
+   
+      <form method="post" action="{{ url_for('rate_song', song_id=song.id) }}">
+        {{ form.hidden_tag() }}
+        <div class="row">
+          <div class="col-6">
+            {{ form.rating(class="form-control me-5") }}
+           
+          </div>
+          <div class="col-6 d-flex justify-content-end">
+            <button class="btn btn-outline-danger">{{ form.like() }} {{ form.like.label }}</button>
+          </div>
+          
+          <div>{{ form.submit(class="btn btn-outline-primary my-3") }}</div>
         </div>
-        <div class="container d-block w-50 h-100 p-3 justify-content-center">
+      </form>
+    
 
-            <div class="container align-items-top mx-5 margin-left-5">
-                <img src="{{  url_for('static', filename='/song.png')  }}" class="img-thumbnail rounded mb-3 shadow" alt="..." width="200 px" height="200 px";">
-            </div>
-
-            <div class="container mb-4">
-                <h3>{{ song.title }}</h3>
-            <h3><small class="text-body-secondary">{{ song.artist }}</small></h3>
-
-            </div>
-            
-            <div class="container mb-5 justify-content-between">
-              <form method="post" action="{{ url_for('rate_song', song_id=song.id) }}">
-                {{ form.hidden_tag() }}
-                
-                  <button>{{ form.like() }}  {{ form.like.label }}</button>
-                
-            
-                  <label for="exampleFormControlInput1" class="form-label"
-                  >{{ form.rating.label }}</label> 
-                  {{ form.rating(class="form-control") }}
-                  <div>{{ form.submit(class="btn btn-primary my-3") }}</div> 
-                </form>
-  
-            </div>  
-            <div class="container align-items-end mt-2">
-                <audio controls src="{{  url_for('static', filename='audios/' + song.title + '.mp3')  }}" class="embed-responsive-item mt-5 align-items-end justify-content-end" style="width: 450px;"></audio>
-            </div>
-        </div>
-        
-      </div>
-    {% endblock content %}
+    <div class="container align-items-end mt-2">
+      <audio
+        controls
+        src="{{  url_for('static', filename='audios/' + song.title + '.mp3')  }}"
+        class="embed-responsive-item mt-5 align-items-end justify-content-end"
+        style="width: 450px"
+      ></audio>
+    </div>
+  </div>
+</div>
+{% endblock content %}

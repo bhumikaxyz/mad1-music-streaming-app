@@ -17,10 +17,10 @@ class User(db.Model, UserMixin):
     is_creator = db.Column(db.Boolean, default = False)
     is_flagged = db.Column(db.Boolean, default = False)
 
-    song = db.relationship('Song', backref='user', lazy=True)
+    song = db.relationship('Song', backref='creator', lazy=True)
     playlists = db.relationship('Playlist', backref = 'user', lazy = True)
-    albums = db.relationship('Album', backref='user', lazy=True)
-    interactions = db.relationship('Interactions', backref = 'user', lazy = 'dynamic')
+    albums = db.relationship('Album', backref='creator', lazy=True)
+    interactions = db.relationship('Interactions', backref = 'user', lazy = 'dynamic', cascade='all, delete-orphan')
 
 
     def __repr__(self):
@@ -36,16 +36,16 @@ class Song(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100), unique = True, nullable = False)
     filename = db.Column(db.String(100), unique =True)
-    duration = db.Column(db.Time, nullable = True)
+    duration = db.Column(db.String, nullable = True)
     lyrics = db.Column(db.Text)
     album_id = db.Column(db.Integer, db.ForeignKey('album.id'))
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     timestamp = db.Column(db.DateTime(), server_default=func.now())
     is_flagged = db.Column(db.Boolean, default = False)
 
 
-    interactions = db.relationship('Interactions', backref = 'song', lazy = 'dynamic')
+    interactions = db.relationship('Interactions', backref = 'song', lazy = 'dynamic', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f'{self.title}'
@@ -56,7 +56,7 @@ class Album(db.Model):
     name = db.Column(db.String(50), nullable = False)
     genre = db.Column(db.String(100), nullable = True, default = 'Other')
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable = False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     timestamp = db.Column(db.DateTime, server_default=func.now())
 
     songs = db.relationship('Song', backref = 'album', lazy = True)
