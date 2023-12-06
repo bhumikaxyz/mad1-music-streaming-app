@@ -37,7 +37,7 @@ class UpdateProfileForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(max=100)])
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
     current_password = PasswordField('Current Password', validators=[DataRequired(), Length(max=50)])
-    password = PasswordField('New Password', validators=[DataRequired(), EqualTo('current_password')])
+    password = PasswordField('New Password', validators=[DataRequired()])
     submit = SubmitField('Update')
 
     def validate_username(self, username):

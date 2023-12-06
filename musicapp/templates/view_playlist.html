@@ -22,7 +22,7 @@
                         <td>{{ song.id }}</td>
                         <td>{{ song.title }}</td>
                         <td>
-                            <a href="{{ url_for('play_song', song_id=song.id) }}" class="btn btn-info btn-sm">Play</a>
+                            <a href="{{ url_for('play_song', song_id=song.id) }}" class="btn btn-outline-info btn-sm">Play</a>
                         </td>
                     </tr>
                     {% endfor%}

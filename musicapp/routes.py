@@ -6,7 +6,6 @@ from musicapp.forms import RegistrationForm, LoginForm, AdminLoginForm, UpdatePr
 from musicapp.models import User, Song, Playlist, Album, Artist, Interactions, playlist_song
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, current_user, login_required
-from pydub import AudioSegment
 from mutagen.mp3 import MP3
 
 
@@ -38,9 +37,10 @@ def login():
 
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user.is_flagged:
-            flash('You are disallowed from using this platform', 'danger')
-            return redirect(url_for('index'))
+        if user: 
+            if user.is_flagged:
+                flash('You are disallowed from using this platform', 'danger')
+                return redirect(url_for('index'))
         
         if user and check_password_hash(user.password_hash, form.password.data):
             login_user(user, remember=form.remember.data)
@@ -126,7 +126,7 @@ def profile():
             form.name.data = current_user.name
             form.username.data = current_user.username
 
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate_on_submit():
         if check_password_hash(current_user.password_hash, form.current_password.data):
             current_user.name = form.name.data
             current_user.username = form.username.data
@@ -135,9 +135,10 @@ def profile():
             db.session.commit()
             flash('Your account has been updated!', 'success')
             return redirect(url_for('home'))
-        else:    
-            flash('Incorrect password', 'danger')
+        else:  
+            flash('Incorrect password', 'danger')  
             return redirect(url_for('profile'))
+            
         
     return render_template('profile.html', form=form)  
 
@@ -181,7 +182,7 @@ def blacklist_song(song_id):
         if song:
             song.is_flagged = True
             db.session.commit()
-    return redirect(url_for('admin_options'))  
+    return redirect(url_for('admin_dashboard'))  
 
 
 @app.route('/whitelist_song/<int:song_id>', methods=['GET', 'POST'])
@@ -191,7 +192,7 @@ def whitelist_song(song_id):
         if song:
             song.is_flagged = False
             db.session.commit()
-    return redirect(url_for('admin_options'))  
+    return redirect(url_for('admin_dashboard'))  
 
 
 @app.route('/blacklist_creator/<int:creator_id>', methods=['GET', 'POST'])
@@ -201,7 +202,7 @@ def blacklist_creator(creator_id):
         if creator:
             creator.is_flagged = True
             db.session.commit()
-    return redirect(url_for('admin_options'))
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/whitelist_creator/<int:creator_id>', methods=['GET', 'POST'])
 def whitelist_creator(creator_id):
@@ -210,7 +211,7 @@ def whitelist_creator(creator_id):
         if creator:
             creator.is_flagged = False
             db.session.commit()
-    return redirect(url_for('admin_options'))
+    return redirect(url_for('admin_dashboard'))
 
 
 # ================================= CRUD on Playlists ========================================
@@ -259,20 +260,23 @@ def view_playlist(playlist_id):
 def update_playlist(playlist_id):
     playlist = Playlist.query.get_or_404(playlist_id)
     form = PlaylistForm()
-    form.name.data = playlist.name
     songs = Song.query.filter_by(is_flagged=False).all()
     form.songs.choices = [(song.id, song.title) for song in songs]
     existing_songs=[song.id for song in playlist.songs]
-
+    
+    if request.method=='GET':
+        form.name.data = playlist.name
+        
     if playlist.user_id != current_user.id:
         abort(403)
     else:
         if request.method == 'POST' and form.validate_on_submit():
+            playlist.name = form.name.data
             selected_songs = form.songs.data
             playlist.songs = Song.query.filter(Song.id.in_(selected_songs)).all()
             db.session.add(playlist)
             db.session.commit()
-            flash('Your playlist has been updated', 'success')
+            flash('Your playlist has been updated.', 'success')
             return redirect(url_for('playlist'))
         
     return render_template('create_playlist.html', form=form, songs=songs, playlist=playlist, legend='Update Post', existing_songs=existing_songs)
@@ -294,7 +298,7 @@ def delete_playlist(playlist_id):
 @app.route('/creator_dashboard')
 @login_required
 def creator_dashboard():
-    albums = Album.query.order_by(Album.timestamp.desc()).all()
+    albums = Album.query.filter_by(creator_id=current_user.id).order_by(Album.timestamp.desc()).all()
     n_songs = Song.query.filter(Song.creator_id==current_user.id).count()
     n_albums = Album.query.filter(Album.creator_id==current_user.id).count()
     avg_rating = (
@@ -303,7 +307,11 @@ def creator_dashboard():
     .filter(Song.creator_id == current_user.id)
     .scalar()
     )
-    avg_rating = round(avg_rating, 1)
+    if avg_rating:
+        avg_rating = round(avg_rating, 1)
+    else:
+        avg_rating=0    
+
     return render_template('creator_dashboard.html', albums=albums, n_songs=n_songs, n_albums=n_albums, avg_rating=avg_rating)
 
 
@@ -311,8 +319,9 @@ def creator_dashboard():
 @login_required
 def create_album():
     form = AlbumForm()
-    songs = Song.query.filter_by(is_flagged=False).all()
+    songs = Song.query.filter_by(is_flagged=False, creator_id=current_user.id).all()
     form.songs.choices = [(song.id, song.title) for song in songs]
+
     if request.method == 'POST' and form.validate_on_submit():
         album = Album(name=form.name.data)
         album.creator_id = current_user.id
@@ -328,7 +337,7 @@ def create_album():
         query_songs = Song.query.filter(Song.id.in_(selected_songs))
         album.songs = list(query_songs)
         for song in album.songs:
-            song.artist.id = artist.id
+            song.artist_id = artist.id
             db.session.add(song)
         db.session.add(album)
         db.session.commit()
@@ -351,24 +360,25 @@ def view_album(album_id):
 def update_album(album_id):
     album = Album.query.get_or_404(album_id)
     form = AlbumForm()
-    form.name.data = album.name
-    form.genre.data = album.genre
-    form.artist.data = album.artist
-    songs = Song.query.filter_by(is_flagged=False, artist_id=album.artist_id).all()
+    # form.artist.data = album.artist
+    songs = Song.query.filter_by(is_flagged=False, artist_id=album.artist_id, creator_id=current_user.id).all()
     existing_songs=[song.id for song in album.songs]
-
     form.songs.choices = [(song.id, song.title) for song in songs]
+
+    if request.method == 'GET':
+        form.name.data = album.name
+        form.genre.data = album.genre
     
     if request.method == 'POST' and form.validate_on_submit():
-        artist_name = form.artist.data
-        artist = Artist.query.filter_by(name=artist_name).first()
-        if not artist:
-            artist = Artist(name=form.artist.data)
-            db.session.add(artist)
-            db.session.commit()
+        # artist_name = form.artist.data
+        # artist = Artist.query.filter_by(name=artist_name).first()
+        # if not artist:
+        #     artist = Artist(name=form.artist.data)
+        #     db.session.add(artist)
+        #     db.session.commit()
 
+         # album.artist_id=artist.id
         album.name = form.name.data
-        album.artist_id=artist.id
         album.genre = form.genre.data
         selected_songs = form.songs.data
         query_songs = Song.query.filter(Song.id.in_(selected_songs)).all()
@@ -385,16 +395,12 @@ def update_album(album_id):
 @login_required
 def delete_album(album_id):
     album = Album.query.get_or_404(album_id)
-    if len(album.songs)==0:
-        db.session.delete(album)
-        db.session.commit()
-        flash('Album has been deleted', 'success')
-        return redirect(url_for('creator_dashboard'))
-    else:
-        flash('The album you wish to delete contains songs. Delete the songs first in order to delete the album', 'danger')   
-        return redirect(url_for('creator_dashboard')) 
+    db.session.delete(album)
+    db.session.commit()
+    flash('Album has been deleted', 'success')
+    return redirect(url_for('creator_dashboard'))
+   
     
-
 
 #====================================== CRUD on Songs ===================================================
 
@@ -453,10 +459,10 @@ def create_song():
 def update_song(song_id):
     song = Song.query.get_or_404(song_id)
     form = SongForm()
-    form.title.data = song.title
-    # form.artist.data = song.artist
-    # form.duration.data = song.duration
-    form.lyrics.data = song.lyrics
+    if request.method=='GET':
+        form.title.data = song.title
+        form.artist.data = song.artist
+        form.lyrics.data = song.lyrics
 
     if request.method == 'POST' and form.validate_on_submit():
 

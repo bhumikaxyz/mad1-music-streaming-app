@@ -60,7 +60,7 @@
                   <a type="button" class="btn btn-sm btn-outline-secondary" href="{{  url_for('play_song', song_id=song.id)  }}">
                     Play
                   </a>
-                  {% if current_user.is_creator %}
+                  {% if current_user.is_creator and song.creator_id == current_user.id %}
                     <a type="button" class="btn btn-sm btn-outline-secondary" href="{{  url_for('update_song', song_id=song.id)  }}">
                       Edit
                     </a>
@@ -96,7 +96,7 @@
                 <a type="button" class="btn btn-sm btn-outline-secondary" href="{{  url_for('play_song', song_id=song.id)  }}">
                   Play
                 </a>
-                {% if current_user.is_creator %}
+                {% if current_user.is_creator and song.creator_id == current_user.id %}
                   <a type="button" class="btn btn-sm btn-outline-secondary" href="{{  url_for('update_song', song_id=song.id)  }}">
                     Edit
                   </a>
