@@ -11,12 +11,13 @@
     >
       <img src="{{ url_for('static', filename='/song.png') }}"
       class="img-thumbnail rounded mb-3 shadow" alt="..." width="200 px"
-      height="200 px";">
+      height="200 px">
     </div>
 
     <div class="container mb-4">
       <h3>{{ song.title }}</h3>
       <h3><small class="text-body-secondary">{{ song.artist }}</small></h3>
+      <p class="text-end"><small>Avg. Rating: {{ average_rating }}</small></p>
     </div>
 
    

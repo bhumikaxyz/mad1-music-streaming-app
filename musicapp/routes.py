@@ -90,10 +90,11 @@ def admin_login():
 @app.route('/home', methods=['GET'])
 @login_required
 def home():
-    form = FilterForm(request.args, csrf_enabled=False) # Initialize form with GET query params
+    form = FilterForm(request.args, csrf_enabled=False) 
     songs = Song.query.filter_by(is_flagged=False).order_by(Song.timestamp.desc())
+    albums = Album.query.order_by(Album.timestamp.desc())
 
-    if request.method == 'GET': # Validate form manually
+    if request.method == 'GET': 
         filter_type = form.filter_type.data
         filter_value = form.filter_value.data
         app.logger.debug('filter_type', filter_type)
@@ -101,7 +102,6 @@ def home():
 
         if filter_value:
             if filter_type == 'artist':
-                # songs = songs.filter(Song.artist.ilike(f"%{filter_value}%"))
                 songs = songs.join(Artist).filter(Artist.name.ilike(f"%{filter_value}%"))
             elif filter_type == 'title':
                 songs = songs.filter(Song.title.ilike(f"%{filter_value}%"))
@@ -112,7 +112,7 @@ def home():
                 except ValueError:
                     flash('Invalid rating value. Please enter a numeric value.', 'danger')
     app.logger.debug(f'filtered songs{songs.all()}')
-    return render_template('home.html', songs=songs.all(), form=form)
+    return render_template('home.html', songs=songs.all(), albums=albums, form=form)
 
     
 
@@ -409,17 +409,20 @@ def delete_album(album_id):
 def play_song(song_id):
     song = Song.query.get_or_404(song_id)
     form = RateSongForm()
+    average_rating = db.session.query(db.func.avg(Interactions.rating)).filter_by(song_id=song_id).scalar()
 
     if song.lyrics:
         lyrics = song.lyrics
     else:    
         try:
-            filepath = f"D:\Study Resources\IITM OD\mad1_project\musicapp\static\lyrics\{song.title}.txt"
+            # filepath = f"D:\Study Resources\IITM OD\mad1_project\musicapp\static\lyrics\{song.title}.txt"
+            filepath = "./musicapp/static/lyrics/" + song.title + ".txt"
+            app.logger.debug("filepath", filepath)
             with open(filepath, 'r') as file:
                 lyrics = file.read()
         except:
             lyrics = 'Lyrics not available.'      
-    return render_template('play_song.html', song=song, lyrics=lyrics, form=form)
+    return render_template('play_song.html', song=song, lyrics=lyrics, form=form, average_rating=average_rating)
 
 
 @app.route('/create_song', methods=['GET', 'POST'])

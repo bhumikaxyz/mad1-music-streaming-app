@@ -24,8 +24,10 @@
                         <td>{{ song.title }}</td>
                         <td>
                             <a href="{{ url_for('play_song', song_id=song.id) }}" class="btn btn-outline-info btn-sm mx-3">Play</a>
+                            {% if current_user.is_creator and album.creator_id == current_user.id %}
                             <a href="{{ url_for('update_song', song_id=song.id) }}" class="btn btn-outline-primary btn-sm mx-3">Edit</a>
                             <a href="{{ url_for('delete_song', song_id=song.id) }}" class="btn btn-outline-danger btn-sm mx-3">Delete</a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor%}
