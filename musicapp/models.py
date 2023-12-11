@@ -35,7 +35,7 @@ playlist_song = db.Table('playlist_song',
 class Song(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100), unique = True, nullable = False)
-    filename = db.Column(db.String(100), unique =True)
+    filename = db.Column(db.String(100))
     duration = db.Column(db.String, nullable = True)
     lyrics = db.Column(db.Text)
     album_id = db.Column(db.Integer, db.ForeignKey('album.id'))
