@@ -168,7 +168,8 @@ def admin_dashboard():
     n_albums = Album.query.count()
     n_artists = Artist.query.count()
     avg_rating = db.session.query(func.avg(Interactions.rating)).scalar()
-    avg_rating = round(avg_rating, 1)
+    if avg_rating is not None:
+        avg_rating = round(avg_rating, 1)
 
 
     return render_template('admin_dashboard.html', songs=songs, creators=creators,
@@ -248,8 +249,8 @@ def view_playlist(playlist_id):
     playlist = Playlist.query.get_or_404(playlist_id)
     songs = (
         db.session.query(Song)
-        .join(playlist_song)
-        .filter(Playlist.id == playlist_id, Song.is_flagged.is_(False))
+        .join(playlist_song, Song.id == playlist_song.c.song_id)
+        .filter(playlist_song.c.playlist_id  == playlist_id, Song.is_flagged.is_(False))
         .all()
     )
     return render_template('view_playlist.html', playlist=playlist, songs=songs)
